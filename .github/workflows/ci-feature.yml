@@ -5,7 +5,19 @@ on:
       - 'feature/**'
 
 jobs:
-  smoke:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "workflow parsed and started OK"
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }}
+          # change "Project" to "." if Dockerfile is at repo root
+          docker build -t $IMAGE Project
+          docker push $IMAGE
