@@ -18,6 +18,5 @@ jobs:
 
       - run: |
           IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }}
-          # change "Project" to "." if Dockerfile is at repo root
           docker build -t $IMAGE Project
           docker push $IMAGE
