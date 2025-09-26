@@ -1,0 +1,15 @@
+name: CI PR
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          IMAGE=ghcr.io/${REPO_LC}:pr-${{ github.event.number }}
+          docker build -t $IMAGE Project   # build only; no push on PR
