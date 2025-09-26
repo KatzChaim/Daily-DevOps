@@ -5,20 +5,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+
+      # set python
+      - uses: actions/setup-python@v5
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          python-version: "3.12"
+
+      # install deps (app + test)
       - run: |
-          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
-          IMAGE=ghcr.io/${REPO_LC}:${GITHUB_SHA}
-          docker build -t $IMAGE Project
-          docker push $IMAGE
+          pip install --no-cache-dir -r Project/requirements.txt
+          pip install --no-cache-dir pytest
+
+      # run tests (point PYTHONPATH to Project so we can import app)
+      - run: |
+          export PYTHONPATH=Project
+          pytest -q
+          
+#jobs:
+#  build-and-push:
+ #   runs-on: ubuntu-latest
+ #   permissions:
+ #     contents: read
+ #     packages: write
+  #  steps:
+   #   - uses: actions/checkout@v4
+    #  - uses: docker/login-action@v3
+     #   with:
+      #    registry: ghcr.io
+       #   username: ${{ github.actor }}
+        #  password: ${{ secrets.GITHUB_TOKEN }}
+#      - run: |
+ #         REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+  #        IMAGE=ghcr.io/${REPO_LC}:${GITHUB_SHA}
+   #       docker build -t $IMAGE Project
+    #      docker push $IMAGE
