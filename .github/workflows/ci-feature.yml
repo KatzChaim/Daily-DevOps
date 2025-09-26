@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -17,7 +20,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
-          IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }}
-          # change "Project" to "." if Dockerfile is at repo root
+          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          IMAGE=ghcr.io/${REPO_LC}:${GITHUB_SHA}
+          echo "Building image $IMAGE"
+
           docker build -t $IMAGE Project
           docker push $IMAGE
