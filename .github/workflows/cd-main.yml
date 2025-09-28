@@ -12,6 +12,7 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -22,16 +23,28 @@ jobs:
         run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           IMAGE=ghcr.io/${REPO_LC}
-
           docker build -t ${IMAGE}:latest Project
           docker tag ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
-
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      - name: Update K8s deployment to new image
+      # --- Deploy only if we have cluster access via kubeconfig secret ---
+
+      - name: Setup kubectl
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        uses: azure/setup-kubectl@v4
+
+      - name: Write kubeconfig from secret
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+
+      - name: Update K8s deployment to new image (pin SHA) 
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
         run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
           kubectl -n prod rollout status deploy/fm-app
-          
