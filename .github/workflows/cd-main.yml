@@ -10,6 +10,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      # מעתיקים את הסיקרט למשתנה סביבה
+      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -28,22 +32,20 @@ jobs:
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      # --- Deploy only if we have cluster access via kubeconfig secret ---
+      # --- Deploy only if KUBECONFIG_B64 is set ---
 
       - name: Setup kubectl
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        if: ${{ env.KUBECONFIG_B64 != '' }}
         uses: azure/setup-kubectl@v4
 
       - name: Write kubeconfig from secret
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        if: ${{ env.KUBECONFIG_B64 != '' }}
         run: |
           mkdir -p $HOME/.kube
           echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
-        env:
-          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
 
-      - name: Update K8s deployment to new image (pin SHA) 
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+      - name: Update K8s deployment to new image (pin SHA)
+        if: ${{ env.KUBECONFIG_B64 != '' }}
         run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
