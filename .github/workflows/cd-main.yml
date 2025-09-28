@@ -34,3 +34,4 @@ jobs:
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
           kubectl -n prod rollout status deploy/fm-app
+          
