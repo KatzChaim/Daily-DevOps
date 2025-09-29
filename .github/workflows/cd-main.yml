@@ -1,7 +1,7 @@
 name: CD main
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -10,9 +10,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    env:
-      # מעתיקים את הסיקרט למשתנה סביבה
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,24 +25,31 @@ jobs:
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           IMAGE=ghcr.io/${REPO_LC}
           docker build -t ${IMAGE}:latest Project
-          docker tag ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
+          docker tag  ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      # --- Deploy only if KUBECONFIG_B64 is set ---
-
+      # מדלגים על כל ה-K8s אם אין kubeconfig ב-secrets
       - name: Setup kubectl
-        if: ${{ env.KUBECONFIG_B64 != '' }}
-        uses: azure/setup-kubectl@v4
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        run: |
+          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.29.6/bin/linux/amd64/kubectl
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
 
       - name: Write kubeconfig from secret
-        if: ${{ env.KUBECONFIG_B64 != '' }}
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
         run: |
-          mkdir -p $HOME/.kube
-          echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
+          echo "$KUBECONFIG_B64" | base64 -d > $GITHUB_WORKSPACE/kubeconfig
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig
 
       - name: Update K8s deployment to new image (pin SHA)
-        if: ${{ env.KUBECONFIG_B64 != '' }}
+        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig
         run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
