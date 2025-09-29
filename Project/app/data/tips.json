@@ -1,3 +1,4 @@
+[
   {
     "title": "מדדו DORA, לא תחושות",
     "body": "עקבו אחרי Lead Time, Deployment Frequency, Change Failure Rate, MTTR ושפרו בהתמדה.",
@@ -22,4 +23,4 @@
     "source": "HashiCorp Docs",
     "url": "https://developer.hashicorp.com/terraform"
   }
-
+]

@@ -17,6 +17,15 @@
     </div>
   </header>
 
+  <!-- חיפוש חופשי -->
+  <section class="search container">
+    <div class="search-box">
+      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)..." />
+      <button id="btn">חפש</button>
+    </div>
+    <div id="results" class="results"></div>
+  </section>
+
   <main class="container grid">
     <!-- Quote of the Day -->
     <section class="card accent">
@@ -42,7 +51,7 @@
         <div class="video">
           <div class="video-title">{{ v.title }}</div>
           <div class="video-frame">
-            <iframe src="{{ v.embed }}" title="{{ v.title }}" frameborder="0" allowfullscreen></iframe>
+            <iframe src="{{ v.embed }}" title="{{ v.title }}" allowfullscreen></iframe>
           </div>
         </div>
         {% endfor %}
@@ -55,7 +64,7 @@
       <div class="tools">
         {% for t in tools %}
         <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
-          <div class="tool-name">{{ t.name }}</div>
+          <div class="tool-name">{{ t.name or t.title }}</div>
           <div class="tool-desc">{{ t.desc }}</div>
         </a>
         {% endfor %}
@@ -77,5 +86,33 @@
     <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
     <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
   </footer>
+
+  <script>
+  async function runSearch() {
+    const q = document.getElementById('q').value.trim();
+    const box = document.getElementById('results');
+    if (!q) { box.innerHTML = ''; return; }
+    box.innerHTML = '<p class="muted">מחפש...</p>';
+    const r = await fetch('/search?q=' + encodeURIComponent(q));
+    const data = await r.json();
+    if (!data.results.length) {
+      box.innerHTML = '<p class="muted">לא נמצאו תוצאות.</p>';
+      return;
+    }
+    box.innerHTML = data.results.map(item => `
+      <div class="card result-card">
+        <small class="tag">${item.type}</small>
+        <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
+          <h4>${item.title || item.name || 'ללא כותרת'}</h4>
+        </a>
+        <p>${item.desc || ''}</p>
+      </div>
+    `).join('');
+  }
+  document.getElementById('btn').addEventListener('click', runSearch);
+  document.getElementById('q').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter') runSearch();
+  });
+  </script>
 </body>
 </html>
