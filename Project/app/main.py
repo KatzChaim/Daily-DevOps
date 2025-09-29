@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import json, datetime
 
-from .content import VIDEOS, TOOLS, LEARNING
+from Project.app.old_content import VIDEOS, TOOLS, LEARNING
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
