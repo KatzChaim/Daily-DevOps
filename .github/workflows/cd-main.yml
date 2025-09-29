@@ -2,7 +2,7 @@ name: CD main
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -25,30 +25,42 @@ jobs:
 
       - name: Build & push image (latest + SHA)
         run: |
+          set -euo pipefail
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           IMAGE=ghcr.io/${REPO_LC}
           docker build -t ${IMAGE}:latest Project
-          docker tag ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
+          docker tag  ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      - name: Setup kubectl
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'v1.28.0'
-
-      - name: Write kubeconfig from secret
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
+      # Deploy ירוץ רק אם יש KUBECONFIG_B64 (בדיקה בבאש, לא ב-if של YAML)
+      - name: Maybe deploy to Kubernetes (only if KUBECONFIG_B64 exists)
         env:
           KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
-
-      - name: Update K8s deployment to new image (pin SHA)
-        if: ${{ secrets.KUBECONFIG_B64 != '' }}
+          GITHUB_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
         run: |
-          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          set -euo pipefail
+
+          if [ -z "${KUBECONFIG_B64:-}" ]; then
+            echo "No KUBECONFIG_B64 secret set. Skipping Kubernetes deploy."
+            exit 0
+          fi
+
+          echo "Kubeconfig secret found. Proceeding with deploy."
+          # Install kubectl
+          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.28.0/bin/linux/amd64/kubectl
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+          # Write kubeconfig
+          mkdir -p "$HOME/.kube"
+          echo "$KUBECONFIG_B64" | base64 -d > "$HOME/.kube/config"
+          export KUBECONFIG="$HOME/.kube/config"
+
+          # Lowercase repo for GHCR path
+          REPO_LC=$(echo "${REPO}" | tr '[:upper:]' '[:lower:]')
+
+          # Rollout new image pinned to SHA
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
           kubectl -n prod rollout status deploy/fm-app
