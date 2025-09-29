@@ -1,20 +1,23 @@
 name: CD main
+
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/login-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -25,31 +28,26 @@ jobs:
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           IMAGE=ghcr.io/${REPO_LC}
           docker build -t ${IMAGE}:latest Project
-          docker tag  ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
+          docker tag ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      # מדלגים על כל ה-K8s אם אין kubeconfig ב-secrets
       - name: Setup kubectl
         if: ${{ secrets.KUBECONFIG_B64 != '' }}
-        run: |
-          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.29.6/bin/linux/amd64/kubectl
-          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
-          kubectl version --client
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.28.0'
 
       - name: Write kubeconfig from secret
         if: ${{ secrets.KUBECONFIG_B64 != '' }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
         env:
           KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
-        run: |
-          echo "$KUBECONFIG_B64" | base64 -d > $GITHUB_WORKSPACE/kubeconfig
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig
 
       - name: Update K8s deployment to new image (pin SHA)
         if: ${{ secrets.KUBECONFIG_B64 != '' }}
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig
         run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
