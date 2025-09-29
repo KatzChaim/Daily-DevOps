@@ -1,23 +1,23 @@
 name: CD main
+
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    env:
-      # מעתיקים את הסיקרט למשתנה סביבה
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/login-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -25,28 +25,42 @@ jobs:
 
       - name: Build & push image (latest + SHA)
         run: |
+          set -euo pipefail
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           IMAGE=ghcr.io/${REPO_LC}
           docker build -t ${IMAGE}:latest Project
-          docker tag ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
+          docker tag  ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
 
-      # --- Deploy only if KUBECONFIG_B64 is set ---
-
-      - name: Setup kubectl
-        if: ${{ env.KUBECONFIG_B64 != '' }}
-        uses: azure/setup-kubectl@v4
-
-      - name: Write kubeconfig from secret
-        if: ${{ env.KUBECONFIG_B64 != '' }}
+      # Deploy ירוץ רק אם יש KUBECONFIG_B64 (בדיקה בבאש, לא ב-if של YAML)
+      - name: Maybe deploy to Kubernetes (only if KUBECONFIG_B64 exists)
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+          GITHUB_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
         run: |
-          mkdir -p $HOME/.kube
-          echo "${KUBECONFIG_B64}" | base64 -d > $HOME/.kube/config
+          set -euo pipefail
 
-      - name: Update K8s deployment to new image (pin SHA)
-        if: ${{ env.KUBECONFIG_B64 != '' }}
-        run: |
-          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          if [ -z "${KUBECONFIG_B64:-}" ]; then
+            echo "No KUBECONFIG_B64 secret set. Skipping Kubernetes deploy."
+            exit 0
+          fi
+
+          echo "Kubeconfig secret found. Proceeding with deploy."
+          # Install kubectl
+          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.28.0/bin/linux/amd64/kubectl
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+          # Write kubeconfig
+          mkdir -p "$HOME/.kube"
+          echo "$KUBECONFIG_B64" | base64 -d > "$HOME/.kube/config"
+          export KUBECONFIG="$HOME/.kube/config"
+
+          # Lowercase repo for GHCR path
+          REPO_LC=$(echo "${REPO}" | tr '[:upper:]' '[:lower:]')
+
+          # Rollout new image pinned to SHA
           kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
           kubectl -n prod rollout status deploy/fm-app
