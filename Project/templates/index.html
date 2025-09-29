@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily DevOps</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="container">
+    <div class="brand">
+      <div class="logo">⚙️</div>
+      <div>
+        <h1>Daily DevOps</h1>
+        <p class="subtitle">משפט היום · טיפ היום · סרטונים · כלים · הדרכות</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container grid">
+    <!-- Quote of the Day -->
+    <section class="card accent">
+      <h2>משפט היום</h2>
+      <p class="quote">“{{ quote }}”</p>
+    </section>
+
+    <!-- Tip of the Day -->
+    <section class="card">
+      <h2>טיפ DevOps של היום</h2>
+      <h3 class="tip-title">{{ tip.title }}</h3>
+      <p>{{ tip.body }}</p>
+      <p class="source">
+        מקור: <a href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
+      </p>
+    </section>
+
+    <!-- Videos -->
+    <section class="card">
+      <h2>סרטוני DevOps</h2>
+      <div class="videos">
+        {% for v in videos %}
+        <div class="video">
+          <div class="video-title">{{ v.title }}</div>
+          <div class="video-frame">
+            <iframe src="{{ v.embed }}" title="{{ v.title }}" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="card">
+      <h2>כלים מומלצים</h2>
+      <div class="tools">
+        {% for t in tools %}
+        <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
+          <div class="tool-name">{{ t.name }}</div>
+          <div class="tool-desc">{{ t.desc }}</div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Learning -->
+    <section class="card">
+      <h2>הדרכות וקישורי לימוד</h2>
+      <ul class="learning">
+        {% for l in learning %}
+          <li><a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.title }}</a> — {{ l.desc }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
+    <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
+  </footer>
+</body>
+</html>
