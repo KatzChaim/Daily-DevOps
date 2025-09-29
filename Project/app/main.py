@@ -1,48 +1,61 @@
-:root{
-  --bg:#0f172a;         /* slate-900 */
-  --panel:#111827;      /* gray-900 */
-  --card:#0b1222;       /* deep bluish */
-  --acc:#1d4ed8;        /* blue-600 */
-  --acc2:#22c55e;       /* green-500 */
-  --text:#e5e7eb;       /* gray-200 */
-  --muted:#94a3b8;      /* slate-400 */
-  --shadow:0 10px 25px rgba(0,0,0,.35);
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:linear-gradient(120deg,#0b1222,#0f172a 40%,#0b1222);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
-a{color:#a5b4fc;text-decoration:none}
-a:hover{color:#c4b5fd;text-decoration:underline}
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
+import json, datetime
 
-.container{max-width:1100px;margin:0 auto;padding:24px}
-.brand{display:flex;align-items:center;gap:16px}
-.logo{font-size:36px;background:linear-gradient(45deg,var(--acc),#60a5fa);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow)}
-.subtitle{color:var(--muted);margin-top:4px}
+from .content import VIDEOS, TOOLS, LEARNING
 
-.grid{display:grid;gap:20px;grid-template-columns:repeat(12,1fr)}
-.card{grid-column:span 12;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
-.card h2{margin:0 0 12px 0}
-.accent{border-color:rgba(29,78,216,.6);background:linear-gradient(180deg,rgba(29,78,216,.2),rgba(255,255,255,0.02))}
-.quote{font-size:22px;font-weight:600}
-.tip-title{margin:.2rem 0 .2rem 0;font-weight:700}
+BASE = Path(__file__).resolve().parent
+DATA = BASE / "data"
 
-.videos{display:grid;gap:14px;grid-template-columns:repeat(12,1fr)}
-.video{grid-column:span 12;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.06)}
-.video-title{margin:6px 6px 10px 6px;color:var(--muted);font-weight:600}
-.video-frame{position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden}
-.video-frame iframe{position:absolute;inset:0;width:100%;height:100%}
+app = FastAPI(title="Daily DevOps")
 
-.tools{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.tool{grid-column:span 12;background:linear-gradient(180deg,rgba(34,197,94,.15),rgba(255,255,255,0.02));border:1px solid rgba(34,197,94,.35);padding:12px;border-radius:12px;display:block}
-.tool-name{font-weight:700}
-.tool-desc{color:var(--muted)}
+# static & templates
+app.mount("/static", StaticFiles(directory=str(BASE / "static")), name="static")
+templates = Jinja2Templates(directory=str(BASE / "templates"))
 
-.learning{padding-left:18px}
-.footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px}
+def _pick_daily(items):
+    today = int(datetime.date.today().strftime("%Y%m%d"))
+    return items[today % len(items)] if items else None
 
-@media(min-width:900px){
-  .card:nth-child(1){grid-column:span 6}
-  .card:nth-child(2){grid-column:span 6}
-  .card:nth-child(3){grid-column:span 12}
-  .card:nth-child(4){grid-column:span 6}
-  .card:nth-child(5){grid-column:span 6}
-}
+def _load_json(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok"}
+
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
+    quotes = _load_json(DATA / "quotes.json")
+    tips = _load_json(DATA / "tips.json")
+    q = _pick_daily(quotes)["text"]
+    t = _pick_daily(tips)
+    repo = "katzchaim/financial-management"
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "quote": q,
+            "tip": t,
+            "videos": VIDEOS,
+            "tools": TOOLS,
+            "learning": LEARNING,
+            "repo": repo,
+        },
+    )
+
+@app.get("/quote")
+def quote():
+    quotes = _load_json(DATA / "quotes.json")
+    q = _pick_daily(quotes)
+    return JSONResponse(q)
+
+@app.get("/tips")
+def tips():
+    tips = _load_json(DATA / "tips.json")
+    t = _pick_daily(tips)
+    return JSONResponse(t)
