@@ -1,1 +1,25 @@
-[{"title":"SLO/SLI לפני אלרטים","body":"הגדירו SLO עסקי ו-SLI מדיד.","source":"SRE Book","url":"https://sre.google/books/"}]
+  {
+    "title": "מדדו DORA, לא תחושות",
+    "body": "עקבו אחרי Lead Time, Deployment Frequency, Change Failure Rate, MTTR ושפרו בהתמדה.",
+    "source": "Accelerate – Forsgren, Humble, Kim",
+    "url": "https://itrevolution.com/accelerate/"
+  },
+  {
+    "title": "SLO/SLI לפני אלרטים",
+    "body": "הגדירו SLO עסקי ו-SLI מדיד; אלרטים נגזרים מהם – לא הפוך.",
+    "source": "Google SRE Book",
+    "url": "https://sre.google/books/"
+  },
+  {
+    "title": "Secrets לא בקוד",
+    "body": "נהלו סודות ב-K8s Secrets או AWS Secrets Manager; אל תשמרו ברפו.",
+    "source": "OWASP Cheatsheets",
+    "url": "https://cheatsheetseries.owasp.org/"
+  },
+  {
+    "title": "IaC כברירת מחדל",
+    "body": "Terraform לקלאסטר, מודולים לגרסאות; PR לכל שינוי בתשתית.",
+    "source": "HashiCorp Docs",
+    "url": "https://developer.hashicorp.com/terraform"
+  }
+]
