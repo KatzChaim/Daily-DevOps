@@ -5,7 +5,7 @@ VIDEOS = [
 ]
 
 TOOLS = [
-    {"name": "Yuval Guide", "desc": "Guide-blog for DevOps courses", "url": "https://www.yuval.guide"}
+    {"name": "Yuval Guide", "desc": "Guide-blog for DevOps courses", "url": "https://www.yuval.guide"},
     {"name": "GitHub Actions", "desc": "Multi-branch CI/CD", "url": "https://docs.github.com/actions"},
     {"name": "Docker", "desc": "Containers & images", "url": "https://docs.docker.com/"},
     {"name": "Kubernetes", "desc": "Orchestrate at scale", "url": "https://kubernetes.io/docs/"},
@@ -16,7 +16,7 @@ TOOLS = [
 ]
 
 LEARNING = [
-    {"title": "Study DevOps (Hebrew)", "desc": "Self-paced DevOps course in Hebrew: Linux, Git, Bash, Python, Docker, Kubernetes, AWS, Terraform.", "url": "https://www.yuval.guide/courses/study-devops-he/"}
+    {"title": "Study DevOps (Hebrew)", "desc": "Self-paced DevOps course in Hebrew: Linux, Git, Bash, Python, Docker, Kubernetes, AWS, Terraform.", "url": "https://www.yuval.guide/courses/study-devops-he/"},
     {"title": "Accelerate (Book)", "desc": "The DORA research behind high-perf teams.", "url": "https://itrevolution.com/accelerate/"},
     {"title": "Google SRE Book", "desc": "SLI/SLO, error budgets, release policies.", "url": "https://sre.google/books/"},
     {"title": "Docker Getting Started", "desc": "Hands-on walkthroughs.", "url": "https://docs.docker.com/get-started/"},

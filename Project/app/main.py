@@ -10,6 +10,8 @@ from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from typing import List, Dict
 import json, datetime
+import os, httpx
+
 
 # Local curated content (videos/tools/learning)
 from content import VIDEOS, TOOLS, LEARNING

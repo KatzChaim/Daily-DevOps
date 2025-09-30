@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'AWS-Code'
+      - 'HTML-Setting'
+      - 'Html-setting'
+      - 'Web-Browser'
+      - 'eks'
+
 
 jobs:
   build:

@@ -1,14 +1,12 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <!-- Page head: loads the shared CSS theme -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daily DevOps</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <!-- Header area with logo/title/subtitle -->
   <header class="container">
     <div class="brand">
       <div class="logo">⚙️</div>
@@ -19,34 +17,33 @@
     </div>
   </header>
 
-  <!-- Search UI (DevOps-only from local curated lists) -->
+  <!-- DevOps-only search (client-side) -->
   <section class="search container">
-    <div class="search-box">
-      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)..." />
+    <div class="search-box ltr"><!-- Force LTR typing -->
+      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…" />
       <button id="btn">חפש</button>
     </div>
-    <div id="results" class="results"></div>
+    <div id="results" class="results ltr"></div><!-- Results shown LTR -->
   </section>
 
-  <!-- Main content grid -->
   <main class="container grid">
-    <!-- Quote of the day -->
+    <!-- Quote of the Day -->
     <section class="card accent">
       <h2>משפט היום</h2>
       <p class="quote">“{{ quote }}”</p>
     </section>
 
-    <!-- Tip of the day -->
+    <!-- Tip of the Day -->
     <section class="card">
       <h2>טיפ DevOps של היום</h2>
       <h3 class="tip-title">{{ tip.title }}</h3>
       <p>{{ tip.body }}</p>
-      <p class="source">מקור:
-        <a href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
+      <p class="source">
+        מקור: <a href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
       </p>
     </section>
 
-    <!-- DevOps videos -->
+    <!-- Videos -->
     <section class="card">
       <h2>סרטוני DevOps</h2>
       <div class="videos">
@@ -54,28 +51,28 @@
         <div class="video">
           <div class="video-title">{{ v.title }}</div>
           <div class="video-frame">
-            <iframe src="{{ v.embed }}" title="{{ v.title }}" allowfullscreen></iframe>
+            <iframe src="{{ v.embed }}" title="{{ v.title }}" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Recommended tools -->
-    <section class="card">
+    <!-- Tools (mostly English → LTR) -->
+    <section class="card ltr">
       <h2>כלים מומלצים</h2>
       <div class="tools">
         {% for t in tools %}
         <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
-          <div class="tool-name">{{ t.name or t.title }}</div>
+          <div class="tool-name">{{ t.name }}</div>
           <div class="tool-desc">{{ t.desc }}</div>
         </a>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Learning links -->
-    <section class="card">
+    <!-- Learning (mostly English → LTR) -->
+    <section class="card ltr">
       <h2>הדרכות וקישורי לימוד</h2>
       <ul class="learning">
         {% for l in learning %}
@@ -85,39 +82,41 @@
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="container footer">
+  <footer class="container footer ltr"><!-- Footer in LTR/left -->
     <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
     <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
   </footer>
 
-  <!-- Search script: fetches /search and renders results -->
   <script>
+  // DevOps-only search client (English-only comments)
+  // This calls your FastAPI route /search?q=... (server must whitelist DevOps sources)
   async function runSearch() {
     const q = document.getElementById('q').value.trim();
     const box = document.getElementById('results');
     if (!q) { box.innerHTML = ''; return; }
-    box.innerHTML = '<p class="muted">מחפש...</p>';
-    const r = await fetch('/search?q=' + encodeURIComponent(q));
-    const data = await r.json();
-    if (!data.results.length) {
-      box.innerHTML = '<p class="muted">לא נמצאו תוצאות.</p>';
-      return;
+    box.innerHTML = 'מחפש...';
+    try {
+      const r = await fetch('/search?q=' + encodeURIComponent(q));
+      const data = await r.json();
+      if (!data.results || !data.results.length) {
+        box.innerHTML = '<p>לא נמצאו תוצאות.</p>';
+        return;
+      }
+      box.innerHTML = data.results.map(item => `
+        <div class="card">
+          <small class="tag">${item.type || 'link'}</small>
+          <a href="${item.url}" target="_blank" rel="noopener">
+            <h4>${item.title || 'ללא כותרת'}</h4>
+          </a>
+          <p>${item.desc || ''}</p>
+        </div>
+      `).join('');
+    } catch (e) {
+      box.innerHTML = '<p>שגיאה בחיפוש.</p>';
     }
-    box.innerHTML = data.results.map(item => `
-      <div class="card result-card">
-        <small class="tag">${item.type}</small>
-        <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
-          <h4>${item.title || item.name || 'ללא כותרת'}</h4>
-        </a>
-        <p>${item.desc || ''}</p>
-      </div>
-    `).join('');
   }
   document.getElementById('btn').addEventListener('click', runSearch);
-  document.getElementById('q').addEventListener('keydown', (e)=>{
-    if(e.key==='Enter') runSearch();
-  });
+  document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
   </script>
 </body>
 </html>
