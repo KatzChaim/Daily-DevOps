@@ -34,5 +34,5 @@ variable "node_max_size" {
 variable "instance_types" {
   description = "Node types"
   type        = list(string)
-  default     = ["t3.medium"]
+  default     = ["t3a.small"]
 }
