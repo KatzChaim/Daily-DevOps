@@ -8,11 +8,16 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write  # אם תעבור ל-OIDC בהמשך
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}   # או secret
+  K8S_NAMESPACE: prod
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -32,35 +37,48 @@ jobs:
           docker tag  ${IMAGE}:latest ${IMAGE}:${GITHUB_SHA}
           docker push ${IMAGE}:latest
           docker push ${IMAGE}:${GITHUB_SHA}
-
-      # Deploy ירוץ רק אם יש KUBECONFIG_B64 (בדיקה בבאש, לא ב-if של YAML)
-      - name: Maybe deploy to Kubernetes (only if KUBECONFIG_B64 exists)
         env:
-          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
           GITHUB_SHA: ${{ github.sha }}
-          REPO: ${{ github.repository }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+          # לחלופין בעתיד: role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+      - name: Debug identity & vars
         run: |
-          set -euo pipefail
+          aws sts get-caller-identity
+          echo "AWS_REGION=${AWS_REGION}"
+          echo "EKS_CLUSTER_NAME=${EKS_CLUSTER_NAME}"
 
-          if [ -z "${KUBECONFIG_B64:-}" ]; then
-            echo "No KUBECONFIG_B64 secret set. Skipping Kubernetes deploy."
-            exit 0
-          fi
+      - name: Wait for EKS to be ACTIVE
+        run: |
+          aws eks wait cluster-active --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}"
+          aws eks describe-cluster --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}" --query cluster.status
 
-          echo "Kubeconfig secret found. Proceeding with deploy."
-          # Install kubectl
-          curl -sLO https://storage.googleapis.com/kubernetes-release/release/v1.28.0/bin/linux/amd64/kubectl
-          chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name "${EKS_CLUSTER_NAME}" --region "${AWS_REGION}"
           kubectl version --client
+          kubectl get nodes
 
-          # Write kubeconfig
-          mkdir -p "$HOME/.kube"
-          echo "$KUBECONFIG_B64" | base64 -d > "$HOME/.kube/config"
-          export KUBECONFIG="$HOME/.kube/config"
+      - name: Ensure namespace exists
+        run: |
+          kubectl create namespace "${K8S_NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 
-          # Lowercase repo for GHCR path
-          REPO_LC=$(echo "${REPO}" | tr '[:upper:]' '[:lower:]')
+      - name: Deploy manifests
+        run: |
+          kubectl apply -n "${K8S_NAMESPACE}" -f k8s/ --validate=false
 
-          # Rollout new image pinned to SHA
-          kubectl -n prod set image deploy/fm-app app=ghcr.io/${REPO_LC}:${GITHUB_SHA}
-          kubectl -n prod rollout status deploy/fm-app
+      - name: Pin image & rollout
+        run: |
+          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          IMAGE=ghcr.io/${REPO_LC}
+          kubectl -n "${K8S_NAMESPACE}" set image deploy/fm-app app=${IMAGE}:${GITHUB_SHA}
+          kubectl -n "${K8S_NAMESPACE}" rollout status deploy/fm-app --timeout=300s
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        
