@@ -1,0 +1,78 @@
+{
+    "cluster": {
+        "name": "fm-eks",
+        "arn": "arn:aws:eks:eu-central-1:640168441859:cluster/fm-eks",
+        "createdAt": "2025-09-29T13:10:19.455000-04:00",
+        "version": "1.32",
+        "endpoint": "https://FAEF7358022053B32C95E1F5497D7D84.gr7.eu-central-1.eks.amazonaws.com",
+        "roleArn": "arn:aws:iam::640168441859:role/eksctl-fm-eks-cluster-ServiceRole-H6fNMtssaSC3",
+        "resourcesVpcConfig": {
+            "subnetIds": [
+                "subnet-0c56d187463049321",
+                "subnet-0843e7f9eeaf461e9",
+                "subnet-05f0674164da19038",
+                "subnet-03810118f8a8ab869",
+                "subnet-010ae824605970249",
+                "subnet-0dfdd56ed28651ba8"
+            ],
+            "securityGroupIds": [
+                "sg-081d84c4536061889"
+            ],
+            "clusterSecurityGroupId": "sg-0b2d8ee5dadd2a966",
+            "vpcId": "vpc-0d38ebf3659ce4b4c",
+            "endpointPublicAccess": true,
+            "endpointPrivateAccess": false,
+            "publicAccessCidrs": [
+                "0.0.0.0/0"
+            ]
+        },
+        "kubernetesNetworkConfig": {
+            "serviceIpv4Cidr": "10.100.0.0/16",
+            "ipFamily": "ipv4",
+            "elasticLoadBalancing": {
+                "enabled": false
+            }
+        },
+        "logging": {
+            "clusterLogging": [
+                {
+                    "types": [
+                        "api",
+                        "audit",
+                        "authenticator",
+                        "controllerManager",
+                        "scheduler"
+                    ],
+                    "enabled": false
+                }
+            ]
+        },
+        "identity": {
+            "oidc": {
+                "issuer": "https://oidc.eks.eu-central-1.amazonaws.com/id/FAEF7358022053B32C95E1F5497D7D84"
+            }
+        },
+        "status": "ACTIVE",
+        "certificateAuthority": {
+            "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJY0ovUHhIZllpVFV3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBNU1qa3hOekV3TlRKYUZ3MHpOVEE1TWpjeE56RTFOVEphTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURGNHZJMGd4YzZ0OTliZis2SVBCNjVwaWI5c2Q3RzlYalR0Q09iUG8veGpJeTR1K3VWTWRGamtoTVkKMWUva1hJQW02UW96dm4rWUZ5cFlEUzE2RGN1eGpVVjdkVXczVnIxYVYxOEU2OXBKRUtEdGdUeWVUTExiN1kwTApjZUhnbGhkSytYajhIaGI1cHhnSzU4WnVKVldlV25hR2J6bjRnNEZFS2JlZXNyYzFTZXVMNkhhUGwvN3pQbFpZCmV4eStGSVdVV1pWU04vNVVvYjVGUTFXa2VsREZpbDd4eWFBZDhCRDluT0piWmw1eUM2YlpJMzdSb1JIUDN5V1kKR3RYVjRPR25GL08yM1RlZ3FIdkJVaHlYNXdIaEZUNjNJWnNXREVic3ZFdTVnTEFwWXJiaUFpM2Q5K0dsL2M4dApONFNPc2VZQWFEdi9GRDUxUlg3d254cDhHaTB0QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRcGJmVSt5TU8xWlI1YVZHTmQrMUdGb0tVNjNUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQlBZalByNXRuYQp4NXVMQVhpMDZaaTcwbktiRmJTdXF0QW1VU0FtckJackdZVFhXMFJDc3NuRnQwMEcvbW8rb24xblcvUEtZblZsCmU0YW53a0xYNVJtTGd0MDlTV29RbGVXMVdYUWxLZER4UTM0ZkcxK2FiNGl6aFdNRitURkdmeGpLeVBHRmpDTkQKWUtrcFJ6ODVYMm1LTzkzazN5MU9QeHdFTFhHMnR1dGxMSG9lek5PSFQ3YW1pL0JETFFIeGRkRjdZeStSTjR0egpuZDBRczVzdERRYUdrK0kxajFML2V4VWJhMStabll6UTZsT0tGQ3B5THp4NFJZWEFlVFR2UTU5c2IxMEdSQWZ5ClVLMDBWUlhITnZtejRrdjFObzNSZStCWWJrdklHMFRqaHhnZTRnRko3a3hzVE5KNnIzNnRqa3lIZnZsRG0vRDcKclFmeE5OaTk4ZkZKCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+        },
+        "platformVersion": "eks.22",
+        "tags": {
+            "aws:cloudformation:stack-name": "eksctl-fm-eks-cluster",
+            "alpha.eksctl.io/cluster-name": "fm-eks",
+            "aws:cloudformation:stack-id": "arn:aws:cloudformation:eu-central-1:640168441859:stack/eksctl-fm-eks-cluster/1d86e260-9d57-11f0-a600-06b7aa663f09",
+            "eksctl.cluster.k8s.io/v1alpha1/cluster-name": "fm-eks",
+            "alpha.eksctl.io/cluster-oidc-enabled": "true",
+            "aws:cloudformation:logical-id": "ControlPlane",
+            "alpha.eksctl.io/eksctl-version": "0.214.0",
+            "Name": "eksctl-fm-eks-cluster/ControlPlane"
+        },
+        "accessConfig": {
+            "authenticationMode": "API_AND_CONFIG_MAP"
+        },
+        "upgradePolicy": {
+            "supportType": "EXTENDED"
+        },
+        "deletionProtection": false
+    }
+}

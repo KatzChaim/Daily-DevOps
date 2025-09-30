@@ -1,8 +1,0 @@
-[
-  { "text": "Automate what hurts first." },
-  { "text": "Small, frequent deploys reduce risk." },
-  { "text": "You can’t improve what you don’t measure." },
-  { "text": "Infrastructure as Code or it will drift." },
-  { "text": "SLOs drive the right behavior." },
-  { "text": "Security is everyone’s job." }
-]
