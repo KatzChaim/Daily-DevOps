@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./Project
-          file: ./Dockerfile
+          file: ./Project/Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE_URI }}:${{ env.IMAGE_TAG_SHA }}
