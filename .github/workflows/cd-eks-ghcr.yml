@@ -37,7 +37,7 @@ jobs:
       - name: Build & push image (latest + SHA)
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./Project
           file: ./Dockerfile
           push: true
           tags: |
