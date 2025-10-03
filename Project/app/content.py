@@ -1,8 +1,14 @@
 VIDEOS = [
     {"title": "Intro to CI/CD", "embed": "https://www.youtube.com/embed/scEDHsr3APg"},
     {"title": "Kubernetes in 15 minutes", "embed": "https://www.youtube.com/embed/s_o8dwzRlu4"},
-    {"title": "Infrastructure as Code (Terraform)", "embed": "https://www.youtube.com/embed/h970ZBgKINg"}
+    {"title": "Infrastructure as Code (Terraform)", "embed": "https://www.youtube.com/embed/h970ZBgKINg"},
+    {"title": "What is DevOps?", "embed": "https://www.youtube.com/embed/0yWAtQ6wYNM"},
+    {"title": "Docker in 12 Minutes", "embed": "https://www.youtube.com/embed/YFl2mCHdv24"},
+    {"title": "GitHub Actions Tutorial – CI/CD Pipelines", "embed": "https://www.youtube.com/embed/-hk_ajF4GL8"},
+    {"title": "Helm in 15 Minutes", "embed": "https://www.youtube.com/embed/-ykwb1d0DXU"},
+    {"title": "Monitoring with Prometheus & Grafana", "embed": "https://www.youtube.com/embed/h4Sl21AKiDg"},
 ]
+
 
 TOOLS = [
     {"name": "Yuval Guide", "desc": "Guide-blog for DevOps courses", "url": "https://www.yuval.guide"},
