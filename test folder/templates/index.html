@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily DevOps</title>
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/addons.css"><!-- חיצים/מודאל/כפתורים -->
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="container">
+    <div class="brand">
+      <div class="logo">⚙️</div>
+      <div>
+        <h1>Daily DevOps</h1>
+        <p class="subtitle">משפט היום · טיפ היום · סרטונים · כלים · הדרכות</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search -->
+  <section class="search container">
+    <div class="search-box ltr">
+      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…" />
+      <select id="scope">
+        <option value="local" selected>לוקאלי</option>
+        <option value="web">וובי</option>
+        <option value="all">שניהם</option>
+      </select>
+      <label class="muted" style="display:flex;align-items:center;gap:.35rem">
+        <input id="strict" type="checkbox" checked>
+        דומיינים מאושרים בלבד
+      </label>
+      <button id="btn">חפש</button>
+    </div>
+    <div id="results" class="results ltr"></div>
+  </section>
+
+  <main class="container grid">
+    <!-- Quote of the Day -->
+    <section class="card accent" id="quote-card">
+      <h2>משפט היום</h2>
+
+      <div class="nav-row">
+        <button class="nav-btn left" id="q-prev" aria-label="הציטוט הקודם" title="הקודם">
+          <!-- חץ שמאלה -->
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <p class="quote">“<span id="q-text">{{ quote.text }}</span>”</p>
+
+          {% if quote.category or (quote.tags and quote.tags|length) %}
+            <div class="meta" id="q-meta">
+              {% if quote.category %}
+                <span class="badge badge-blue" id="q-cat">{{ quote.category }}</span>
+              {% else %}
+                <span class="badge badge-blue" id="q-cat" style="display:none;"></span>
+              {% endif %}
+              <span id="q-tags">
+                {% for tg in quote.tags %}
+                  <span class="chip">{{ tg }}</span>
+                {% endfor %}
+              </span>
+            </div>
+          {% else %}
+            <div class="meta" id="q-meta" style="display:none;"></div>
+          {% endif %}
+        </div>
+
+        <button class="nav-btn right" id="q-next" aria-label="הציטוט הבא" title="הבא">
+          <!-- חץ ימינה -->
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Tip of the Day -->
+    <section class="card" id="tip-card">
+      <h2>טיפ DevOps של היום</h2>
+
+      <div class="nav-row">
+        <button class="nav-btn left" id="t-prev" aria-label="הטיפ הקודם" title="הקודם">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <h3 class="tip-title" id="t-title">{{ tip.title }}</h3>
+          <p id="t-body">{{ tip.body }}</p>
+          <p class="source">
+            מקור:
+            <a id="t-url" href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
+          </p>
+        </div>
+
+        <button class="nav-btn right" id="t-next" aria-label="הטיפ הבא" title="הבא">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Video (single player with arrows) -->
+    <section class="card" id="video-card">
+      <h2>סרטוני DevOps</h2>
+
+      <div class="nav-row">
+        <button class="nav-btn left" id="v-prev" aria-label="הווידאו הקודם" title="הקודם">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <div class="video">
+            <div class="video-title" id="v-title">
+              {% if videos and videos|length %}{{ videos[0].title }}{% else %}—{% endif %}
+            </div>
+            <div class="video-frame">
+              <iframe id="v-iframe"
+                src="{% if videos and videos|length %}{{ videos[0].embed }}{% endif %}"
+                title="{% if videos and videos|length %}{{ videos[0].title }}{% endif %}"
+                frameborder="0" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+
+        <button class="nav-btn right" id="v-next" aria-label="הווידאו הבא" title="הבא">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Tools (mostly English → LTR) -->
+    <section class="card ltr">
+      <h2>כלים מומלצים</h2>
+      <div class="tools">
+        {% for t in tools %}
+          <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
+            <div class="tool-name">{{ t.name }}</div>
+            <div class="tool-desc">{{ t.desc }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Learning (mostly English → LTR) -->
+    <section class="card ltr">
+      <h2>הדרכות וקישורי לימוד</h2>
+      <ul class="learning">
+        {% for l in learning %}
+          <li><a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.title }}</a> — {{ l.desc }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="container footer ltr">
+    <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
+    <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
+  </footer>
+
+  <!-- Floating action: Idea -->
+  <button id="open-idea" class="fab" title="יש לכם רעיון?">💡</button>
+
+  <!-- Modal: Idea submit -->
+  <dialog id="idea-modal" class="modal">
+    <form method="dialog" id="idea-form" class="modal-card">
+      <header class="modal-head">
+        <h3>יש לכם רעיון?</h3>
+        <button class="icon-btn" id="idea-close" aria-label="סגירה">✕</button>
+      </header>
+      <div class="modal-body">
+        <label>שם (אופציונלי)</label>
+        <input type="text" id="idea-name" placeholder="שם פרטי…">
+
+        <label style="margin-top:.5rem">רעיון</label>
+        <textarea id="idea-text" rows="4" placeholder="שתפו טיפ, כלי, שיפור…"></textarea>
+
+        <p id="idea-msg" class="muted" style="display:none;margin-top:.5rem"></p>
+      </div>
+      <footer class="modal-foot">
+        <button type="submit" class="primary">שליחה</button>
+        <button type="button" id="idea-cancel">ביטול</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Inline data arrays for JS (avoid tojson dependency) -->
+  <script>
+    // Build a JS array of videos from server-side context
+    const VIDEOS = [
+      {% for v in videos %}
+        { title: {{ (v.title or '')|tojson }}, embed: {{ (v.embed or '')|tojson }} }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+  </script>
+
+  <script>
+  // ---------- Search ----------
+  async function runSearch() {
+    const q = document.getElementById('q').value.trim();
+    const scope = document.getElementById('scope').value;
+    const strict = document.getElementById('strict').checked ? 1 : 0;
+    const box = document.getElementById('results');
+    if (!q) { box.innerHTML = ''; return; }
+    box.innerHTML = 'מחפש...';
+    try {
+      const r = await fetch(`/search?q=${encodeURIComponent(q)}&scope=${scope}&strict=${strict}`);
+      const data = await r.json();
+      if (!data.results || !data.results.length) {
+        box.innerHTML = '<p>לא נמצאו תוצאות.</p>';
+        return;
+      }
+      box.innerHTML = data.results.map(item => `
+        <div class="card">
+          <small class="tag">${item.type || 'link'}</small>
+          <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
+            <h4>${item.title || 'ללא כותרת'}</h4>
+          </a>
+          <p>${item.desc || ''}</p>
+        </div>
+      `).join('');
+    } catch (e) {
+      box.innerHTML = '<p>שגיאה בחיפוש.</p>';
+    }
+  }
+  document.getElementById('btn').addEventListener('click', runSearch);
+  document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+
+  // ---------- Quotes carousel (with category/tags) ----------
+  let QUOTES = [];
+  let qIndex = 0;
+
+  function renderQuote(q) {
+    const qText = document.getElementById('q-text');
+    const qMeta = document.getElementById('q-meta');
+    const qCat  = document.getElementById('q-cat');
+    const qTags = document.getElementById('q-tags');
+
+    qText.textContent = q.text || '';
+
+    // category/tags visibility
+    if ((q.category && q.category.length) || (q.tags && q.tags.length)) {
+      qMeta.style.display = '';
+      if (q.category) {
+        qCat.style.display = '';
+        qCat.textContent = q.category;
+      } else {
+        qCat.style.display = 'none';
+        qCat.textContent = '';
+      }
+      qTags.innerHTML = (q.tags || []).map(t => `<span class="chip">${t}</span>`).join('');
+    } else {
+      qMeta.style.display = 'none';
+      qCat.textContent = '';
+      qTags.innerHTML = '';
+    }
+  }
+
+  function stepQuote(dir) {
+    if (!QUOTES.length) return;
+    qIndex = (qIndex + dir + QUOTES.length) % QUOTES.length;
+    renderQuote(QUOTES[qIndex]);
+  }
+
+  async function initQuotes() {
+    try {
+      const res = await fetch('/api/quotes');
+      const data = await res.json();
+      // Normalize items: support {text} only, or with category/tags
+      QUOTES = (data || []).map(it => {
+        if (typeof it === 'string') return { text: it, category: null, tags: [] };
+        return {
+          text: it.text || '',
+          category: it.category || null,
+          tags: Array.isArray(it.tags) ? it.tags : []
+        };
+      });
+      // Find the server-rendered quote as starting point
+      const currentText = document.getElementById('q-text').textContent;
+      const i = QUOTES.findIndex(x => x.text === currentText);
+      qIndex = i >= 0 ? i : 0;
+      // Re-render (ensures category/tags appear also for initial)
+      renderQuote(QUOTES[qIndex]);
+    } catch (e) {
+      // keep server-rendered single quote
+    }
+  }
+
+  document.getElementById('q-prev').addEventListener('click', ()=> stepQuote(-1));
+  document.getElementById('q-next').addEventListener('click', ()=> stepQuote(+1));
+
+  // ---------- Tips carousel ----------
+  let TIPS = [];
+  let tIndex = 0;
+
+  function renderTip(t) {
+    document.getElementById('t-title').textContent = t.title || '';
+    document.getElementById('t-body').textContent  = t.body || '';
+    const a = document.getElementById('t-url');
+    a.textContent = t.source || '';
+    a.href = t.url || '#';
+  }
+
+  function stepTip(dir) {
+    if (!TIPS.length) return;
+    tIndex = (tIndex + dir + TIPS.length) % TIPS.length;
+    renderTip(TIPS[tIndex]);
+  }
+
+  async function initTips() {
+    try {
+      const res = await fetch('/api/tips');
+      const data = await res.json();
+      TIPS = (data || []);
+      const currentTitle = document.getElementById('t-title').textContent;
+      const i = TIPS.findIndex(x => (x.title||'') === currentTitle);
+      tIndex = i >= 0 ? i : 0;
+      renderTip(TIPS[tIndex]);
+    } catch (e) {
+      // keep server-rendered single tip
+    }
+  }
+
+  document.getElementById('t-prev').addEventListener('click', ()=> stepTip(-1));
+  document.getElementById('t-next').addEventListener('click', ()=> stepTip(+1));
+
+  // ---------- Video carousel ----------
+  let vIndex = 0;
+
+  function renderVideo(i) {
+    if (!VIDEOS.length) return;
+    const v = VIDEOS[i];
+    document.getElementById('v-title').textContent = v.title || '';
+    const iframe = document.getElementById('v-iframe');
+    iframe.src = v.embed || '';
+    iframe.title = v.title || '';
+  }
+
+  function stepVideo(dir) {
+    if (!VIDEOS.length) return;
+    vIndex = (vIndex + dir + VIDEOS.length) % VIDEOS.length;
+    renderVideo(vIndex);
+  }
+
+  document.getElementById('v-prev').addEventListener('click', ()=> stepVideo(-1));
+  document.getElementById('v-next').addEventListener('click', ()=> stepVideo(+1));
+
+  // ---------- Ideas modal ----------
+  const modal  = document.getElementById('idea-modal');
+  const openBt = document.getElementById('open-idea');
+  const closeX = document.getElementById('idea-close');
+  const cancel = document.getElementById('idea-cancel');
+  const form   = document.getElementById('idea-form');
+  const msg    = document.getElementById('idea-msg');
+
+  function openModal(){ modal.showModal(); }
+  function closeModal(){ modal.close(); }
+
+  openBt.addEventListener('click', openModal);
+  closeX.addEventListener('click', closeModal);
+  cancel.addEventListener('click', closeModal);
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msg.style.display = 'none';
+    const name = (document.getElementById('idea-name').value || '').trim();
+    const text = (document.getElementById('idea-text').value || '').trim();
+    if (!text) {
+      msg.textContent = 'נא למלא רעיון.';
+      msg.style.display = '';
+      return;
+    }
+    try {
+      const r = await fetch('/api/ideas', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name, text })
+      });
+      if (!r.ok) throw new Error('bad status');
+      msg.textContent = 'תודה! הרעיון נשמר.';
+      msg.style.display = '';
+      form.reset();
+      setTimeout(closeModal, 800);
+    } catch (err) {
+      msg.textContent = 'תקלה בשליחה. נסו שוב.';
+      msg.style.display = '';
+    }
+  });
+
+  // ---------- Init ----------
+  (async function init(){
+    initQuotes();
+    initTips();
+    // videos already have first rendered; keep it synced
+    if (VIDEOS.length) renderVideo(0);
+  })();
+  </script>
+</body>
+</html>
