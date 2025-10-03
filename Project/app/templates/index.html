@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daily DevOps</title>
 
-  <!-- העיצוב המקורי שלך -->
   <link rel="stylesheet" href="/static/style.css">
-  <!-- תוספות (חיצים + LTR) -->
   <link rel="stylesheet" href="/static/addons.css">
-  <!-- אייקון אתר -->
   <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -23,7 +20,7 @@
     </div>
   </header>
 
-  <!-- חיפוש -->
+  <!-- Search -->
   <section class="search container">
     <div class="search-box ltr">
       <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…">
@@ -33,7 +30,7 @@
   </section>
 
   <main class="container grid">
-    <!-- משפט היום (עם חיצים) -->
+    <!-- Quote -->
     <section class="card accent card-nav" id="quote-card">
       <button class="nav-btn prev" aria-label="הקודם" data-target="quote">
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
@@ -54,7 +51,7 @@
       </button>
     </section>
 
-    <!-- טיפ היום (עם חיצים) -->
+    <!-- Tip -->
     <section class="card card-nav" id="tip-card">
       <button class="nav-btn prev" aria-label="הקודם" data-target="tip">
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,7 +75,7 @@
       </button>
     </section>
 
-    <!-- סרטונים (קרוסלה) -->
+    <!-- Videos -->
     <section class="card card-nav" id="videos-card">
       <button class="nav-btn prev" aria-label="הקודם" data-target="video">
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
@@ -103,7 +100,17 @@
       </button>
     </section>
 
-    <!-- כלים (LTR) -->
+    <!-- Ideas -->
+    <section class="card" id="ideas-card">
+      <h2 class="align-start">הרעיונות שלכם</h2>
+      <p class="muted align-start">שתפו רעיון קטן לשיפור האתר/התוכן.</p>
+      <div class="ideas-actions">
+        <button id="open-idea" class="btn-primary">שתפו רעיון</button>
+      </div>
+      <ul id="ideas-list" class="ideas-list"></ul>
+    </section>
+
+    <!-- Tools -->
     <section class="card ltr">
       <h2 class="align-start">Recommended tools</h2>
       <div class="tools">
@@ -116,7 +123,7 @@
       </div>
     </section>
 
-    <!-- הדרכות (LTR) -->
+    <!-- Learning -->
     <section class="card ltr">
       <h2 class="align-start">Learning resources</h2>
       <ul class="learning">
@@ -132,13 +139,37 @@
     <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
   </footer>
 
-  <!-- מעביר את מערך הסרטונים מהשרת (content.py) -->
+  <!-- Videos injected -->
   <script id="videos-data" type="application/json">
     {{ videos|tojson|safe }}
   </script>
 
+  <!-- Ideas modal -->
+  <div id="idea-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="idea-title">
+      <div class="modal__header">
+        <h3 id="idea-title">יש לכם רעיון?</h3>
+        <button id="idea-close" class="modal__close" aria-label="סגור">×</button>
+      </div>
+      <div class="modal__body">
+        <label class="field">
+          <span>שם (אופציונלי)</span>
+          <input id="idea-name" type="text" placeholder="איך לקרוא לך?">
+        </label>
+        <label class="field">
+          <span>ה רעיון</span>
+          <textarea id="idea-text" rows="5" dir="auto" placeholder="ספרו בקצרה מה תרצו לראות פה..."></textarea>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button id="idea-cancel" class="btn">בטל</button>
+        <button id="idea-save" class="btn-primary">שמור</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    /* ===== חיפוש (מקומי + רשת) ===== */
+    /* ===== Search (local + web) ===== */
     async function runSearch() {
       const q = document.getElementById('q').value.trim();
       const box = document.getElementById('results');
@@ -163,12 +194,11 @@
     document.getElementById('btn').addEventListener('click', runSearch);
     document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
 
-    /* ===== קרוסלות (quotes/tips/videos) ===== */
+    /* ===== Carousels (quotes/tips/videos) ===== */
     let QUOTES = [], TIPS = [], VIDEOS = [];
     const st = { qi: 0, ti: 0, vi: 0 };
     const $  = (id) => document.getElementById(id);
 
-    // סרטונים שמוזרקים מהשרת
     (function loadVideosFromScript(){
       const el = document.getElementById('videos-data');
       try { VIDEOS = JSON.parse(el.textContent || '[]'); } catch {}
@@ -178,9 +208,10 @@
     function renderVideo(){
       if (!VIDEOS.length) return;
       const v = VIDEOS[st.vi % VIDEOS.length];
-      const t = $('video-title'), f = $('video-iframe');
-      if (t) t.textContent = v.title || '';
-      if (f) { f.src = v.embed || v.url || ''; f.title = v.title || 'video'; }
+      $('video-title').textContent = v.title || '';
+      const f = $('video-iframe');
+      f.src = v.embed || v.url || '';
+      f.title = v.title || 'video';
     }
 
     async function loadQuotesTips(){
@@ -200,17 +231,18 @@
     function renderQuote(){
       if (!QUOTES.length) return;
       const q = QUOTES[st.qi % QUOTES.length];
-      const qt = $('quote-text'), qa = $('quote-author');
-      if (qt) qt.textContent = `“${q.text}”`;
-      if (qa) qa.textContent = q.author ? `— ${q.author}` : '';
+      $('quote-text').textContent = `“${q.text}”`;
+      const qa = $('quote-author');
+      qa.textContent = q.author ? `— ${q.author}` : '';
     }
     function renderTip(){
       if (!TIPS.length) return;
       const t = TIPS[st.ti % TIPS.length];
-      const tt=$('tip-title'), tb=$('tip-body'), tl=$('tip-link');
-      if (tt) tt.textContent = t.title || '';
-      if (tb) tb.textContent = t.body  || '';
-      if (tl) { tl.textContent = t.source || 'source'; tl.href = t.url || '#'; }
+      $('tip-title').textContent = t.title || '';
+      $('tip-body').textContent  = t.body  || '';
+      const link = $('tip-link');
+      link.textContent = t.source || 'source';
+      link.href = t.url || '#';
     }
     function step(kind, dir){
       if (kind==='quote' && QUOTES.length){ st.qi=(st.qi+dir+QUOTES.length)%QUOTES.length; renderQuote(); }
@@ -225,7 +257,56 @@
       });
     });
 
+    /* ===== Ideas modal + API ===== */
+    const ideas = {
+      modal: document.getElementById('idea-modal'),
+      openBtn: document.getElementById('open-idea'),
+      closeBtn: document.getElementById('idea-close'),
+      cancelBtn: document.getElementById('idea-cancel'),
+      saveBtn: document.getElementById('idea-save'),
+      name: document.getElementById('idea-name'),
+      text: document.getElementById('idea-text'),
+      list: document.getElementById('ideas-list'),
+      open(){ this.modal.classList.remove('hidden'); this.text.focus(); },
+      close(){ this.modal.classList.add('hidden'); this.name.value=''; this.text.value=''; },
+      async load(){
+        try{
+          const r = await fetch('/api/ideas', {cache:'no-store'});
+          const data = await r.json();
+          const items = (data.items||[]);
+          this.list.innerHTML = items.length ? items.map(it=>{
+            const dt = new Date((it.ts||0)*1000);
+            const when = dt.toLocaleString('he-IL');
+            const who  = it.name ? `<strong>${it.name}</strong> · ` : '';
+            return `<li class="idea-item"><div>${who}<span class="muted">${when}</span></div><p>${(it.text||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</p></li>`;
+          }).join('') : '<li class="muted">אין עדיין רעיונות. היו הראשונים!</li>';
+        }catch(e){ this.list.innerHTML = '<li class="muted">שגיאה בטעינת רעיונות.</li>'; }
+      },
+      async save(){
+        const payload = { name: this.name.value.trim(), text: this.text.value.trim() };
+        if (!payload.text || payload.text.length < 3){ alert('כתוב רעיון קצר (לפחות 3 תווים)'); return; }
+        this.saveBtn.disabled = true;
+        try{
+          const r = await fetch('/api/ideas', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          if (!r.ok) throw new Error('bad status '+r.status);
+          this.close();
+          await this.load();
+        }catch(e){ alert('שמירה נכשלה'); }
+        finally{ this.saveBtn.disabled = false; }
+      }
+    };
+    ideas.openBtn.addEventListener('click', ()=>ideas.open());
+    ideas.closeBtn.addEventListener('click', ()=>ideas.close());
+    ideas.cancelBtn.addEventListener('click', ()=>ideas.close());
+    ideas.saveBtn.addEventListener('click', ()=>ideas.save());
+    ideas.modal.addEventListener('click', (e)=>{ if(e.target===ideas.modal){ ideas.close(); } });
+
+    // init
     loadQuotesTips();
+    ideas.load();
   </script>
 </body>
 </html>
