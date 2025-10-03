@@ -1,0 +1,63 @@
+/* LTR helper לאזורים באנגלית בתוך עמוד RTL */
+.ltr{ direction:ltr; text-align:left; unicode-bidi:plaintext; }
+.align-start{ text-align:start; }
+
+/* ===== כרטיסים עם חיצים (קרוסלה) ===== */
+.card-nav{
+  position: relative;
+  padding-inline: 56px;                 /* מקום לחיצים */
+}
+
+/* איפוס אם נשארו ::before ישנים */
+.card-nav .nav-btn::before{ content: none !important; }
+
+.card-nav .nav-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(15,23,42,.75);
+  color: var(--text);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  cursor: pointer;
+  opacity: .95;
+  transition: transform .15s ease, opacity .15s ease, background .15s ease;
+  z-index: 2;
+}
+.card-nav .nav-btn:hover{
+  opacity: 1;
+  transform: translateY(-50%) scale(1.06);
+}
+.card-nav .nav-btn:active{
+  transform: translateY(-50%) scale(.96);
+}
+
+/* מיקום החיצים בשוליים */
+.card-nav .prev{ left: 14px; }
+.card-nav .next{ right: 14px; }
+html[dir="rtl"] .card-nav .prev{ right: 14px; left: auto; }
+html[dir="rtl"] .card-nav .next{ left: 14px; right: auto; }
+
+/* ה-SVG של החץ */
+.card-nav .nav-btn .chev{
+  width: 18px; height: 18px;
+  fill: currentColor;
+  transition: transform .15s ease;
+}
+
+/* ב-LTR: prev שמאלה (flip), next ימינה (רגיל) */
+.card-nav .prev .chev{ transform: scaleX(-1); }
+.card-nav .next .chev{ transform: none; }
+
+/* ב-RTL מחליפים: prev ימינה, next שמאלה */
+html[dir="rtl"] .card-nav .prev .chev{ transform: none; }
+html[dir="rtl"] .card-nav .next .chev{ transform: scaleX(-1); }
+
+@media (max-width: 640px){
+  .card-nav{ padding-inline: 46px; }
+  .card-nav .nav-btn{ width: 36px; height: 36px; }
+}
