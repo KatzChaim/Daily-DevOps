@@ -1,4 +1,4 @@
-/* Root theme variables */
+/* ===== משתני צבעים/נושאים ===== */
 :root{
   --bg:#0f172a;         /* slate-900 */
   --panel:#111827;      /* gray-900 */
@@ -10,26 +10,34 @@
   --shadow:0 10px 25px rgba(0,0,0,.35);
 }
 
-/* Global resets */
+/* ===== בסיס עמוד ===== */
 *{box-sizing:border-box}
 html[dir="rtl"]{direction:rtl}
 html,body{
-  margin:0;padding:0;
+  margin:0;padding:0; min-height:100%;
   background:linear-gradient(120deg,#0b1222,#0f172a 40%,#0b1222);
+  background-attachment: fixed;
   color:var(--text);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  line-height:1.5;
+  line-height:1.5; scroll-behavior:smooth;
 }
 a{color:#a5b4fc;text-decoration:none}
 a:hover{color:#c4b5fd;text-decoration:underline}
+a:focus-visible{outline:2px solid #60a5fa; outline-offset:2px; border-radius:6px}
 
-/* Layout containers */
+/* ===== פריסת מכולות ===== */
 .container{max-width:1100px;margin:0 auto;padding:24px}
 .brand{display:flex;align-items:center;gap:16px}
-.logo{font-size:36px;background:linear-gradient(45deg,var(--acc),#60a5fa);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow)}
-.subtitle{color:var(--muted);margin-top:4px}
+.logo{
+  font-size:36px;background:linear-gradient(45deg,var(--acc),#60a5fa);
+  border-radius:12px;padding:8px 12px;box-shadow:var(--shadow)
+}
 
-/* Cards & grid */
+
+.subtitle{color:var(--muted);margin-top:4px;  font-size: 1.4rem;   /* מגדיל את הטקסט (≈ 22px) */
+  font-weight: 600; }
+
+/* ===== כרטיסים ורשת ===== */
 .grid{display:grid;gap:20px;grid-template-columns:repeat(12,1fr)}
 .card{
   grid-column:span 12;
@@ -39,7 +47,8 @@ a:hover{color:#c4b5fd;text-decoration:underline}
   padding:18px 20px;
   box-shadow:var(--shadow)
 }
-.card h2{margin:0 0 12px 0}
+.card h2{margin:0 0 12px 0;font-weight:800}
+.card p{margin:.35rem 0}
 .accent{
   border-color:rgba(29,78,216,.6);
   background:linear-gradient(180deg,rgba(29,78,216,.2),rgba(255,255,255,0.02))
@@ -47,33 +56,44 @@ a:hover{color:#c4b5fd;text-decoration:underline}
 .quote{font-size:22px;font-weight:600}
 .tip-title{margin:.2rem 0 .2rem 0;font-weight:700}
 
-/* Videos layout */
+/* ===== סרטונים ===== */
 .videos{display:grid;gap:14px;grid-template-columns:repeat(12,1fr)}
-.video{grid-column:span 12;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.06)}
+.video{
+  grid-column:span 12;background:rgba(255,255,255,0.03);
+  border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,0.06)
+}
 .video-title{margin:6px 6px 10px 6px;color:var(--muted);font-weight:600}
 .video-frame{position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-/* Tools layout */
+/* ===== כלים ===== */
 .tools{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-.tool{grid-column:span 12;background:linear-gradient(180deg,rgba(34,197,94,.15),rgba(255,255,255,0.02));border:1px solid rgba(34,197,94,.35);padding:12px;border-radius:12px;display:block}
+.tool{
+  grid-column:span 12;
+  background:linear-gradient(180deg,rgba(34,197,94,.15),rgba(255,255,255,0.02));
+  border:1px solid rgba(34,197,94,.35);
+  padding:12px;border-radius:12px;display:block
+}
 .tool-name{font-weight:700}
 .tool-desc{color:var(--muted)}
 
-/* Learning list + footer */
+/* ===== לימוד + פוטר ===== */
 .learning{padding-left:18px}
-.footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px}
-
-/* Responsive breakpoints */
-@media(min-width:900px){
-  .card:nth-child(1){grid-column:span 6}
-  .card:nth-child(2){grid-column:span 6}
-  .card:nth-child(3){grid-column:span 12}
-  .card:nth-child(4){grid-column:span 6}
-  .card:nth-child(5){grid-column:span 6}
+.footer{
+  display:flex;justify-content:space-between;align-items:center;
+  color:var(--muted);font-size:14px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px
 }
 
-/* Search UI */
+/* ===== התאמות רוחב (סידור עמודות לפי הסדר) ===== */
+@media(min-width:900px){
+  .card:nth-child(1){grid-column:span 6}   /* משפט היום */
+  .card:nth-child(2){grid-column:span 6}   /* טיפ היום */
+  .card:nth-child(3){grid-column:span 12}  /* סרטונים */
+  .card:nth-child(4){grid-column:span 6}   /* רעיונות */
+  .card:nth-child(5){grid-column:span 6}   /* כלים */
+}
+
+/* ===== חיפוש ===== */
 .search-box{display:flex;gap:.5rem;margin:0 auto;max-width:700px}
 .search-box input{
   flex:1;padding:.6rem .8rem;border:1px solid rgba(255,255,255,0.15);
@@ -88,10 +108,11 @@ a:hover{color:#c4b5fd;text-decoration:underline}
   display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
   gap:1rem;margin-top:1rem
 }
-.result-card .tag{
-  background:#2b2f44;color:#c7d2fe;padding:.15rem .5rem;border-radius:.5rem
+.tag{
+  background:#2b2f44;color:#c7d2fe;padding:.15rem .5rem;border-radius:.5rem;
+  font-size:.8rem
 }
 .result-link h4{margin:.4rem 0}
 
-/* Small helpers */
+/* ===== עזר ===== */
 .muted{color:var(--muted)}

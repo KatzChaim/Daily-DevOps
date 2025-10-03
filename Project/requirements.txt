@@ -3,3 +3,4 @@ uvicorn[standard]
 httpx
 jinja2
 aiofiles
+duckduckgo_search>=6.2.10

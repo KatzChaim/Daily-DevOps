@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daily DevOps</title>
+
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/addons.css">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
 </head>
 <body>
   <header class="container">
@@ -17,50 +20,99 @@
     </div>
   </header>
 
-  <!-- DevOps-only search (client-side) -->
+  <!-- Search -->
   <section class="search container">
-    <div class="search-box ltr"><!-- Force LTR typing -->
-      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…" />
+    <div class="search-box ltr">
+      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…">
       <button id="btn">חפש</button>
     </div>
-    <div id="results" class="results ltr"></div><!-- Results shown LTR -->
+    <div id="results" class="results ltr"></div>
   </section>
 
   <main class="container grid">
-    <!-- Quote of the Day -->
-    <section class="card accent">
-      <h2>משפט היום</h2>
-      <p class="quote">“{{ quote }}”</p>
+    <!-- Quote -->
+    <section class="card accent card-nav" id="quote-card">
+      <button class="nav-btn prev" aria-label="הקודם" data-target="quote">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
+
+      <div>
+        <h2 class="align-start">משפט היום</h2>
+        <p id="quote-text" class="quote align-start">“{{ quote }}”</p>
+        <small id="quote-author" class="align-start muted"></small>
+      </div>
+
+      <button class="nav-btn next" aria-label="הבא" data-target="quote">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
     </section>
 
-    <!-- Tip of the Day -->
-    <section class="card">
-      <h2>טיפ DevOps של היום</h2>
-      <h3 class="tip-title">{{ tip.title }}</h3>
-      <p>{{ tip.body }}</p>
-      <p class="source">
-        מקור: <a href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
-      </p>
+    <!-- Tip -->
+    <section class="card card-nav" id="tip-card">
+      <button class="nav-btn prev" aria-label="הקודם" data-target="tip">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
+
+      <div>
+        <h2 class="align-start">טיפ DevOps של היום</h2>
+        <h3 id="tip-title" class="tip-title align-start">{{ tip.title }}</h3>
+        <p id="tip-body" class="align-start">{{ tip.body }}</p>
+        <p class="source align-start">
+          מקור: <a id="tip-link" href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
+        </p>
+      </div>
+
+      <button class="nav-btn next" aria-label="הבא" data-target="tip">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
     </section>
 
     <!-- Videos -->
-    <section class="card">
-      <h2>סרטוני DevOps</h2>
-      <div class="videos">
-        {% for v in videos %}
+    <section class="card card-nav" id="videos-card">
+      <button class="nav-btn prev" aria-label="הקודם" data-target="video">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
+
+      <div style="width:100%;">
+        <h2>סרטוני DevOps</h2>
         <div class="video">
-          <div class="video-title">{{ v.title }}</div>
+          <div class="video-title" id="video-title"></div>
           <div class="video-frame">
-            <iframe src="{{ v.embed }}" title="{{ v.title }}" frameborder="0" allowfullscreen></iframe>
+            <iframe id="video-iframe" src="" title="" frameborder="0" allowfullscreen></iframe>
           </div>
         </div>
-        {% endfor %}
       </div>
+
+      <button class="nav-btn next" aria-label="הבא" data-target="video">
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </button>
     </section>
 
-    <!-- Tools (mostly English → LTR) -->
+    <!-- Ideas -->
+    <section class="card" id="ideas-card">
+      <h2 class="align-start">הרעיונות שלכם</h2>
+      <p class="muted align-start">שתפו רעיון קטן לשיפור האתר/התוכן.</p>
+      <div class="ideas-actions">
+        <button id="open-idea" class="btn-primary">שתפו רעיון</button>
+      </div>
+      <ul id="ideas-list" class="ideas-list"></ul>
+    </section>
+
+    <!-- Tools -->
     <section class="card ltr">
-      <h2>כלים מומלצים</h2>
+      <h2 class="align-start">Recommended tools</h2>
       <div class="tools">
         {% for t in tools %}
         <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
@@ -71,9 +123,9 @@
       </div>
     </section>
 
-    <!-- Learning (mostly English → LTR) -->
+    <!-- Learning -->
     <section class="card ltr">
-      <h2>הדרכות וקישורי לימוד</h2>
+      <h2 class="align-start">Learning resources</h2>
       <ul class="learning">
         {% for l in learning %}
           <li><a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.title }}</a> — {{ l.desc }}</li>
@@ -82,41 +134,179 @@
     </section>
   </main>
 
-  <footer class="container footer ltr"><!-- Footer in LTR/left -->
+  <footer class="container footer ltr">
     <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
     <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
   </footer>
 
+  <!-- Videos injected -->
+  <script id="videos-data" type="application/json">
+    {{ videos|tojson|safe }}
+  </script>
+
+  <!-- Ideas modal -->
+  <div id="idea-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="idea-title">
+      <div class="modal__header">
+        <h3 id="idea-title">יש לכם רעיון?</h3>
+        <button id="idea-close" class="modal__close" aria-label="סגור">×</button>
+      </div>
+      <div class="modal__body">
+        <label class="field">
+          <span>שם (אופציונלי)</span>
+          <input id="idea-name" type="text" placeholder="איך לקרוא לך?">
+        </label>
+        <label class="field">
+          <span>ה רעיון</span>
+          <textarea id="idea-text" rows="5" dir="auto" placeholder="ספרו בקצרה מה תרצו לראות פה..."></textarea>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button id="idea-cancel" class="btn">בטל</button>
+        <button id="idea-save" class="btn-primary">שמור</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-  // DevOps-only search client (English-only comments)
-  // This calls your FastAPI route /search?q=... (server must whitelist DevOps sources)
-  async function runSearch() {
-    const q = document.getElementById('q').value.trim();
-    const box = document.getElementById('results');
-    if (!q) { box.innerHTML = ''; return; }
-    box.innerHTML = 'מחפש...';
-    try {
-      const r = await fetch('/search?q=' + encodeURIComponent(q));
-      const data = await r.json();
-      if (!data.results || !data.results.length) {
-        box.innerHTML = '<p>לא נמצאו תוצאות.</p>';
-        return;
-      }
-      box.innerHTML = data.results.map(item => `
-        <div class="card">
-          <small class="tag">${item.type || 'link'}</small>
-          <a href="${item.url}" target="_blank" rel="noopener">
-            <h4>${item.title || 'ללא כותרת'}</h4>
-          </a>
-          <p>${item.desc || ''}</p>
-        </div>
-      `).join('');
-    } catch (e) {
-      box.innerHTML = '<p>שגיאה בחיפוש.</p>';
+    /* ===== Search (local + web) ===== */
+    async function runSearch() {
+      const q = document.getElementById('q').value.trim();
+      const box = document.getElementById('results');
+      if (!q) { box.innerHTML = ''; return; }
+      box.innerHTML = 'מחפש...';
+      try {
+        const r = await fetch('/search?q=' + encodeURIComponent(q) + '&scope=all');
+        const data = await r.json();
+        if (!data.results || !data.results.length) {
+          box.innerHTML = '<p>לא נמצאו תוצאות.</p>'; return;
+        }
+        box.innerHTML = data.results.map(item => `
+          <div class="card">
+            <small class="tag">${item.type || 'link'}</small>
+            <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
+              <h4>${item.title || 'ללא כותרת'}</h4>
+            </a>
+            <p>${item.desc || ''}</p>
+          </div>`).join('');
+      } catch { box.innerHTML = '<p>שגיאה בחיפוש.</p>'; }
     }
-  }
-  document.getElementById('btn').addEventListener('click', runSearch);
-  document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+    document.getElementById('btn').addEventListener('click', runSearch);
+    document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+
+    /* ===== Carousels (quotes/tips/videos) ===== */
+    let QUOTES = [], TIPS = [], VIDEOS = [];
+    const st = { qi: 0, ti: 0, vi: 0 };
+    const $  = (id) => document.getElementById(id);
+
+    (function loadVideosFromScript(){
+      const el = document.getElementById('videos-data');
+      try { VIDEOS = JSON.parse(el.textContent || '[]'); } catch {}
+      renderVideo();
+    })();
+
+    function renderVideo(){
+      if (!VIDEOS.length) return;
+      const v = VIDEOS[st.vi % VIDEOS.length];
+      $('video-title').textContent = v.title || '';
+      const f = $('video-iframe');
+      f.src = v.embed || v.url || '';
+      f.title = v.title || 'video';
+    }
+
+    async function loadQuotesTips(){
+      try{
+        const [qRes, tRes] = await Promise.all([
+          fetch('/api/quotes', {cache:'no-store'}),
+          fetch('/api/tips',   {cache:'no-store'}),
+        ]);
+        QUOTES = await qRes.json();
+        TIPS   = await tRes.json();
+        const day = Math.floor(Date.now()/86400000);
+        if (QUOTES.length) st.qi = day % QUOTES.length;
+        if (TIPS.length)   st.ti = day % TIPS.length;
+        renderQuote(); renderTip();
+      }catch(e){ console.error(e); }
+    }
+    function renderQuote(){
+      if (!QUOTES.length) return;
+      const q = QUOTES[st.qi % QUOTES.length];
+      $('quote-text').textContent = `“${q.text}”`;
+      const qa = $('quote-author');
+      qa.textContent = q.author ? `— ${q.author}` : '';
+    }
+    function renderTip(){
+      if (!TIPS.length) return;
+      const t = TIPS[st.ti % TIPS.length];
+      $('tip-title').textContent = t.title || '';
+      $('tip-body').textContent  = t.body  || '';
+      const link = $('tip-link');
+      link.textContent = t.source || 'source';
+      link.href = t.url || '#';
+    }
+    function step(kind, dir){
+      if (kind==='quote' && QUOTES.length){ st.qi=(st.qi+dir+QUOTES.length)%QUOTES.length; renderQuote(); }
+      if (kind==='tip'   && TIPS.length){   st.ti=(st.ti+dir+TIPS.length)%TIPS.length;   renderTip(); }
+      if (kind==='video' && VIDEOS.length){ st.vi=(st.vi+dir+VIDEOS.length)%VIDEOS.length; renderVideo(); }
+    }
+    document.querySelectorAll('.nav-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const kind = btn.dataset.target;
+        const dir  = btn.classList.contains('next') ? +1 : -1;
+        step(kind, dir);
+      });
+    });
+
+    /* ===== Ideas modal + API ===== */
+    const ideas = {
+      modal: document.getElementById('idea-modal'),
+      openBtn: document.getElementById('open-idea'),
+      closeBtn: document.getElementById('idea-close'),
+      cancelBtn: document.getElementById('idea-cancel'),
+      saveBtn: document.getElementById('idea-save'),
+      name: document.getElementById('idea-name'),
+      text: document.getElementById('idea-text'),
+      list: document.getElementById('ideas-list'),
+      open(){ this.modal.classList.remove('hidden'); this.text.focus(); },
+      close(){ this.modal.classList.add('hidden'); this.name.value=''; this.text.value=''; },
+      async load(){
+        try{
+          const r = await fetch('/api/ideas', {cache:'no-store'});
+          const data = await r.json();
+          const items = (data.items||[]);
+          this.list.innerHTML = items.length ? items.map(it=>{
+            const dt = new Date((it.ts||0)*1000);
+            const when = dt.toLocaleString('he-IL');
+            const who  = it.name ? `<strong>${it.name}</strong> · ` : '';
+            return `<li class="idea-item"><div>${who}<span class="muted">${when}</span></div><p>${(it.text||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</p></li>`;
+          }).join('') : '<li class="muted">אין עדיין רעיונות. היו הראשונים!</li>';
+        }catch(e){ this.list.innerHTML = '<li class="muted">שגיאה בטעינת רעיונות.</li>'; }
+      },
+      async save(){
+        const payload = { name: this.name.value.trim(), text: this.text.value.trim() };
+        if (!payload.text || payload.text.length < 3){ alert('כתוב רעיון קצר (לפחות 3 תווים)'); return; }
+        this.saveBtn.disabled = true;
+        try{
+          const r = await fetch('/api/ideas', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+          if (!r.ok) throw new Error('bad status '+r.status);
+          this.close();
+          await this.load();
+        }catch(e){ alert('שמירה נכשלה'); }
+        finally{ this.saveBtn.disabled = false; }
+      }
+    };
+    ideas.openBtn.addEventListener('click', ()=>ideas.open());
+    ideas.closeBtn.addEventListener('click', ()=>ideas.close());
+    ideas.cancelBtn.addEventListener('click', ()=>ideas.close());
+    ideas.saveBtn.addEventListener('click', ()=>ideas.save());
+    ideas.modal.addEventListener('click', (e)=>{ if(e.target===ideas.modal){ ideas.close(); } });
+
+    // init
+    loadQuotesTips();
+    ideas.load();
   </script>
 </body>
 </html>

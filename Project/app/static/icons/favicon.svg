@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- רקע כחול -->
+  <rect width="64" height="64" rx="14" fill="#1d4ed8"></rect>
+  <!-- גלגל שיניים לבן -->
+  <g transform="translate(32 32)" fill="#ffffff">
+    <g id="tooth"><rect x="-2" y="-18" width="4" height="10" rx="1"></rect></g>
+    <use href="#tooth" transform="rotate(45)"></use>
+    <use href="#tooth" transform="rotate(90)"></use>
+    <use href="#tooth" transform="rotate(135)"></use>
+    <use href="#tooth" transform="rotate(180)"></use>
+    <use href="#tooth" transform="rotate(225)"></use>
+    <use href="#tooth" transform="rotate(270)"></use>
+    <use href="#tooth" transform="rotate(315)"></use>
+    <circle r="9"></circle>
+    <circle r="4" fill="#1d4ed8"></circle>
+  </g>
+</svg>
