@@ -41,7 +41,14 @@ a:hover{ color:#c4b5fd; text-decoration:underline; }
   border-radius:12px; padding:8px 12px;
   box-shadow:var(--shadow);
 }
-.subtitle{ color:var(--muted); margin-top:4px; }
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 1.4rem;   /* בערך 22px */
+  font-weight: 500;    /* חצי מודגש */
+}
+
 
 /* ---------- גריד כללי של הכרטיסים ---------- */
 .grid{ display:grid; gap:20px; grid-template-columns:repeat(12,1fr); }
