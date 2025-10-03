@@ -19,8 +19,224 @@
   },
   {
     "title": "IaC כברירת מחדל",
-    "body": "Terraform לקלאסטר, מודולים לגרסאות; PR לכל שינוי בתשתית.",
+    "body": "נהלו תשתיות כקוד עם Terraform/CloudFormation; גרסאות, מודולים וביקורות קוד לכל שינוי.",
     "source": "HashiCorp Docs",
     "url": "https://developer.hashicorp.com/terraform"
+  },
+  {
+    "title": "Trunk-Based Development",
+    "body": "שלבו שינויים קטנים לעתים קרובות לסניף הראשי; קצרו זמן אינטגרציה וסיכוני מיזוג.",
+    "source": "Trunk-Based Development",
+    "url": "https://trunkbaseddevelopment.com/"
+  },
+  {
+    "title": "Feature Flags במקום Branches ארוכים",
+    "body": "הדליקו/כשלו יכולות בפרודקשן ללא פריסה; מאפשר ניסויים בטוחים ו-Rollback מהיר.",
+    "source": "Martin Fowler – Feature Toggles",
+    "url": "https://martinfowler.com/articles/feature-toggles.html"
+  },
+  {
+    "title": "Blue/Green ו-Canary",
+    "body": "הכניסו גרסאות חדשות בהדרגה כדי להפחית סיכון; עקבו אחרי מדדים לפני הרחבה.",
+    "source": "Argo Rollouts",
+    "url": "https://argo-rollouts.readthedocs.io/"
+  },
+  {
+    "title": "GitOps לפריסה אמינה",
+    "body": "מצב הקלאסטר נובע מגיט; Argo CD/Flux מסנכרנים רציף מול המניפסטים.",
+    "source": "Argo CD",
+    "url": "https://argo-cd.readthedocs.io/"
+  },
+  {
+    "title": "Probes בקוברנטיס",
+    "body": "הגדירו Liveness/Readiness/Startup כדי למנוע ניתובים לפודים לא מוכנים.",
+    "source": "Kubernetes Docs",
+    "url": "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"
+  },
+  {
+    "title": "Requests & Limits",
+    "body": "קבעו בקפידה משאבים לפודים כדי למנוע Throttling/OutOfMemory ולשפר תזמון.",
+    "source": "Kubernetes Docs",
+    "url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+  },
+  {
+    "title": "Autoscaling נכון",
+    "body": "השתמשו ב-HPA/VPA לפי עומסים אמיתיים; ודאו מדדים זמינים ויציבים.",
+    "source": "Kubernetes HPA",
+    "url": "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
+  },
+  {
+    "title": "PodDisruptionBudget",
+    "body": "הבטיחו זמינות בעת עדכונים/תחזוקה ע״י PDB שמגביל שיבושים בו-זמניים.",
+    "source": "Kubernetes Docs",
+    "url": "https://kubernetes.io/docs/tasks/run-application/configure-pdb/"
+  },
+  {
+    "title": "רשת מאובטחת עם NetworkPolicy",
+    "body": "הגבילו תקשורת בין שירותים ע״י NetworkPolicies – ברירת מחדל ״deny all״.",
+    "source": "Kubernetes Docs",
+    "url": "https://kubernetes.io/docs/concepts/services-networking/network-policies/"
+  },
+  {
+    "title": "RBAC – הרשאות מינימליות",
+    "body": "השתמשו בתפקידי קוברנטיס מצומצמים; אל תעבדו cluster-admin כברירת מחדל.",
+    "source": "Kubernetes RBAC",
+    "url": "https://kubernetes.io/docs/reference/access-authn-authz/rbac/"
+  },
+  {
+    "title": "Pod Security Standards",
+    "body": "אכפו PSS (Restricted/Baseline) למניעת הרצות פריבילגיות וסיכוני אבטחה.",
+    "source": "Kubernetes Security",
+    "url": "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+  },
+  {
+    "title": "Policy as Code",
+    "body": "בדקו מדיניות עם OPA/Gatekeeper/Conftest ב-CI כדי למנוע קונפיג לא בטוח.",
+    "source": "Open Policy Agent",
+    "url": "https://www.openpolicyagent.org/docs/latest/"
+  },
+  {
+    "title": "תצפיתיות עם OpenTelemetry",
+    "body": "איספו טרייסים, לוגים ומדדים סטנדרטיים; הפיצו לקולקטור מרכזי.",
+    "source": "OpenTelemetry",
+    "url": "https://opentelemetry.io/"
+  },
+  {
+    "title": "Prometheus + Alerting",
+    "body": "עקבו אחרי SLI-ים; הגדירו אלרטים עם סף ברור וזמן שקט למניעת רעש.",
+    "source": "Prometheus Docs",
+    "url": "https://prometheus.io/docs/introduction/overview/"
+  },
+  {
+    "title": "לוגים ל-stdout",
+    "body": "אל תכתבו לקבצים בתוך קונטיינר; שלחו stdout/stderr ואספו ע״י DaemonSet/sidecar.",
+    "source": "12-Factor: Logs",
+    "url": "https://12factor.net/logs"
+  },
+  {
+    "title": "Multi-stage Docker",
+    "body": "בנו אימג׳ים רזים עם multi-stage, נתקו build-time מכלי runtime.",
+    "source": "Docker Docs",
+    "url": "https://docs.docker.com/build/building/multi-stage/"
+  },
+  {
+    "title": "Cache ב-CI",
+    "body": "נצלו שכבות/תלויות קיימות כדי לקצר זמני Build; קבעו מפתחות Cache יציבים.",
+    "source": "GitHub Actions Cache",
+    "url": "https://docs.github.com/actions/using-workflows/caching-dependencies-to-speed-up-workflows"
+  },
+  {
+    "title": "סריקת חולשות",
+    "body": "סרקו אימג׳ים/קוד עם Trivy/Grype; הטמיעו בשלב ה-CI ולא רק בפרודקשן.",
+    "source": "Trivy",
+    "url": "https://aquasecurity.github.io/trivy/"
+  },
+  {
+    "title": "SBOM וחתימת אימג׳ים",
+    "body": "צרו SBOM (Syft) וחתמו אימג׳ים (cosign) כדי לשפר שקיפות ואמינות שרשרת אספקה.",
+    "source": "sigstore/cosign",
+    "url": "https://sigstore.dev/"
+  },
+  {
+    "title": "SLSA – רמות אמון בבילד",
+    "body": "ישמו בקרות שרשרת אספקה לפי SLSA (מקורות קוד חתומים, provenance וכו׳).",
+    "source": "SLSA Framework",
+    "url": "https://slsa.dev/"
+  },
+  {
+    "title": "גיבויים עם שחזור תקופתי",
+    "body": "בדקו שחזור אמיתי (Restore) ולא רק יצירת גיבוי; תעדו זמני RTO/RPO.",
+    "source": "Google SRE – DR",
+    "url": "https://sre.google/sre-book/disaster-planning/"
+  },
+  {
+    "title": "שדרוגים בטוחים למסד נתונים",
+    "body": "בנו מיגרציות Backward-Compatible; פרסו קוד לפני סכימה מחמירה.",
+    "source": "Liquibase",
+    "url": "https://www.liquibase.org/"
+  },
+  {
+    "title": "בלתי הפיך? עשו Shadow/Replay",
+    "body": "שקלו Shadow Traffic או Replays לפני העברת תעבורה אמיתית לגרסה חדשה.",
+    "source": "Google SRE – Testing",
+    "url": "https://sre.google/sre-book/testing-reliability/"
+  },
+  {
+    "title": "Chaos Engineering מתון",
+    "body": "הריצו ניסויי תקלות מבוקרים (Gamedays) כדי לחשוף נקודות שבירה.",
+    "source": "Principles of Chaos",
+    "url": "https://principlesofchaos.org/"
+  },
+  {
+    "title": "תקן אלרטים לפי Golden Signals",
+    "body": "התמקדו ב-Latency, Traffic, Errors, Saturation; אלרטים צריכים להיות Actionable.",
+    "source": "Google SRE Book",
+    "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+  },
+  {
+    "title": "Least Privilege בענן",
+    "body": "IAM Roles מצומצמים; הפרידו חשבונות/פרויקטים לסביבות dev/stage/prod.",
+    "source": "AWS IAM",
+    "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+  },
+  {
+    "title": "הקשחת קונטיינרים",
+    "body": "ריצו כ-User לא פריבילגי; ללא root, ללא CAP מיותרות; readOnlyRootFilesystem.",
+    "source": "Kubernetes Security",
+    "url": "https://kubernetes.io/docs/concepts/security/pod-security-standards/"
+  },
+  {
+    "title": "מדיניות PR וביקורות",
+    "body": "חסמו push ישיר ל-main; דרשו Code Review ובדיקות ירוקות לפני Merge.",
+    "source": "GitHub Branch protection",
+    "url": "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests"
+  },
+  {
+    "title": "Secret Scanning",
+    "body": "הפעילו סריקות סודות אוטומטיות (GitHub/גיטלים) והוסיפו pre-commit hooks כמו gitleaks.",
+    "source": "GitHub Secret scanning",
+    "url": "https://docs.github.com/code-security/secret-scanning/about-secret-scanning"
+  },
+  {
+    "title": "הפרדת קונפיגורציה",
+    "body": "אל תקודדו ערכים בקוד; השתמשו ב-ConfigMaps/Secrets, Helm values או Kustomize overlays.",
+    "source": "Helm/Kustomize",
+    "url": "https://helm.sh/docs/chart_best_practices/values/"
+  },
+  {
+    "title": "Observability כמאפיין מוצר",
+    "body": "תכננו מדדים/לוגים/טרייסים כחלק מהפיצ׳ר; בלי זה לא תדעו אם הצליחה השקה.",
+    "source": "OpenTelemetry",
+    "url": "https://opentelemetry.io/docs/concepts/observability-primer/"
+  },
+  {
+    "title": "קצרו MTTR באמצעות Rollback מהיר",
+    "body": "שמרו תג מבוסס SHA ופקודת Rollback ברורה; צמצמו Blast Radius בשלב ראשון.",
+    "source": "Kubernetes Rollouts",
+    "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment"
+  },
+  {
+    "title": "Cost as a Constraint",
+    "body": "עקבו אחרי עלויות ענן; אופטימיזציות משאבים/מימשוק Spot בהתחשב בזמינות.",
+    "source": "FinOps Foundation",
+    "url": "https://www.finops.org/"
+  },
+  {
+    "title": "תעדו Runbooks ו-Postmortems",
+    "body": "תיעוד קצר, נגיש ומעשי; Blameless כדי לשפר מערכות ולא ״להאשים״ אנשים.",
+    "source": "Google SRE – Postmortems",
+    "url": "https://sre.google/sre-book/postmortem-culture/"
+  },
+  {
+    "title": "תלויות מעודכנות",
+    "body": "אבטחו שרשרת אספקה ע״י עדכון תלויות והפחתת CVEs ישנים; נעלו גרסאות.",
+    "source": "OWASP Dependency Management",
+    "url": "https://cheatsheetseries.owasp.org/cheatsheets/Dependency_Management_Cheat_Sheet.html"
+  },
+  {
+    "title": "נתיבי זהב (Golden Paths)",
+    "body": "צרו תבניות/סקפולדינג לפרויקטים חדשים עם סטנדרטים וקונבנציות ארגוניות.",
+    "source": "Backstage (Golden Paths)",
+    "url": "https://backstage.io/docs/features/software-templates/"
   }
 ]

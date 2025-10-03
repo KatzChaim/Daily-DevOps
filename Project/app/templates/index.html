@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daily DevOps</title>
-
-  <link rel="stylesheet" href="/static/style.css">
-  <link rel="stylesheet" href="/static/addons.css">
   <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/addons.css"><!-- חיצים/מודאל/כפתורים -->
 </head>
 <body>
+
+  <!-- Header -->
   <header class="container">
     <div class="brand">
       <div class="logo">⚙️</div>
@@ -23,109 +24,129 @@
   <!-- Search -->
   <section class="search container">
     <div class="search-box ltr">
-      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…">
+      <input id="q" type="text" placeholder="חפש בעולם ה-DevOps (כלי, וידאו, מדריך)…" />
+      <select id="scope">
+        <option value="local" selected>לוקאלי</option>
+        <option value="web">וובי</option>
+        <option value="all">שניהם</option>
+      </select>
+      <label class="muted" style="display:flex;align-items:center;gap:.35rem">
+        <input id="strict" type="checkbox" checked>
+        דומיינים מאושרים בלבד
+      </label>
       <button id="btn">חפש</button>
     </div>
     <div id="results" class="results ltr"></div>
   </section>
 
   <main class="container grid">
-    <!-- Quote -->
-    <section class="card accent card-nav" id="quote-card">
-      <button class="nav-btn prev" aria-label="הקודם" data-target="quote">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
+    <!-- Quote of the Day -->
+    <section class="card accent" id="quote-card">
+      <h2>משפט היום</h2>
 
-      <div>
-        <h2 class="align-start">משפט היום</h2>
-        <p id="quote-text" class="quote align-start">“{{ quote }}”</p>
-        <small id="quote-author" class="align-start muted"></small>
+      <div class="nav-row">
+        <button class="nav-btn left" id="q-prev" aria-label="הציטוט הקודם" title="הקודם">
+          <!-- חץ שמאלה -->
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <p class="quote">“<span id="q-text">{{ quote.text }}</span>”</p>
+
+          {% if quote.category or (quote.tags and quote.tags|length) %}
+            <div class="meta" id="q-meta">
+              {% if quote.category %}
+                <span class="badge badge-blue" id="q-cat">{{ quote.category }}</span>
+              {% else %}
+                <span class="badge badge-blue" id="q-cat" style="display:none;"></span>
+              {% endif %}
+              <span id="q-tags">
+                {% for tg in quote.tags %}
+                  <span class="chip">{{ tg }}</span>
+                {% endfor %}
+              </span>
+            </div>
+          {% else %}
+            <div class="meta" id="q-meta" style="display:none;"></div>
+          {% endif %}
+        </div>
+
+        <button class="nav-btn right" id="q-next" aria-label="הציטוט הבא" title="הבא">
+          <!-- חץ ימינה -->
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
       </div>
-
-      <button class="nav-btn next" aria-label="הבא" data-target="quote">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
     </section>
 
-    <!-- Tip -->
-    <section class="card card-nav" id="tip-card">
-      <button class="nav-btn prev" aria-label="הקודם" data-target="tip">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
+    <!-- Tip of the Day -->
+    <section class="card" id="tip-card">
+      <h2>טיפ DevOps של היום</h2>
 
-      <div>
-        <h2 class="align-start">טיפ DevOps של היום</h2>
-        <h3 id="tip-title" class="tip-title align-start">{{ tip.title }}</h3>
-        <p id="tip-body" class="align-start">{{ tip.body }}</p>
-        <p class="source align-start">
-          מקור: <a id="tip-link" href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
-        </p>
+      <div class="nav-row">
+        <button class="nav-btn left" id="t-prev" aria-label="הטיפ הקודם" title="הקודם">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <h3 class="tip-title" id="t-title">{{ tip.title }}</h3>
+          <p id="t-body">{{ tip.body }}</p>
+          <p class="source">
+            מקור:
+            <a id="t-url" href="{{ tip.url }}" target="_blank" rel="noopener">{{ tip.source }}</a>
+          </p>
+        </div>
+
+        <button class="nav-btn right" id="t-next" aria-label="הטיפ הבא" title="הבא">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
       </div>
-
-      <button class="nav-btn next" aria-label="הבא" data-target="tip">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
     </section>
 
-    <!-- Videos -->
-    <section class="card card-nav" id="videos-card">
-      <button class="nav-btn prev" aria-label="הקודם" data-target="video">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
+    <!-- Video (single player with arrows) -->
+    <section class="card" id="video-card">
+      <h2>סרטוני DevOps</h2>
 
-      <div style="width:100%;">
-        <h2>סרטוני DevOps</h2>
-        <div class="video">
-          <div class="video-title" id="video-title"></div>
-          <div class="video-frame">
-            <iframe id="video-iframe" src="" title="" frameborder="0" allowfullscreen></iframe>
+      <div class="nav-row">
+        <button class="nav-btn left" id="v-prev" aria-label="הווידאו הקודם" title="הקודם">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="nav-content">
+          <div class="video">
+            <div class="video-title" id="v-title">
+              {% if videos and videos|length %}{{ videos[0].title }}{% else %}—{% endif %}
+            </div>
+            <div class="video-frame">
+              <iframe id="v-iframe"
+                src="{% if videos and videos|length %}{{ videos[0].embed }}{% endif %}"
+                title="{% if videos and videos|length %}{{ videos[0].title }}{% endif %}"
+                frameborder="0" allowfullscreen></iframe>
+            </div>
           </div>
         </div>
-      </div>
 
-      <button class="nav-btn next" aria-label="הבא" data-target="video">
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </button>
+        <button class="nav-btn right" id="v-next" aria-label="הווידאו הבא" title="הבא">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
     </section>
 
-    <!-- Ideas -->
-    <section class="card" id="ideas-card">
-      <h2 class="align-start">הרעיונות שלכם</h2>
-      <p class="muted align-start">שתפו רעיון קטן לשיפור האתר/התוכן.</p>
-      <div class="ideas-actions">
-        <button id="open-idea" class="btn-primary">שתפו רעיון</button>
-      </div>
-      <ul id="ideas-list" class="ideas-list"></ul>
-    </section>
-
-    <!-- Tools -->
+    <!-- Tools (mostly English → LTR) -->
     <section class="card ltr">
-      <h2 class="align-start">Recommended tools</h2>
+      <h2>כלים מומלצים</h2>
       <div class="tools">
         {% for t in tools %}
-        <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
-          <div class="tool-name">{{ t.name }}</div>
-          <div class="tool-desc">{{ t.desc }}</div>
-        </a>
+          <a class="tool" href="{{ t.url }}" target="_blank" rel="noopener">
+            <div class="tool-name">{{ t.name }}</div>
+            <div class="tool-desc">{{ t.desc }}</div>
+          </a>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Learning -->
+    <!-- Learning (mostly English → LTR) -->
     <section class="card ltr">
-      <h2 class="align-start">Learning resources</h2>
+      <h2>הדרכות וקישורי לימוד</h2>
       <ul class="learning">
         {% for l in learning %}
           <li><a href="{{ l.url }}" target="_blank" rel="noopener">{{ l.title }}</a> — {{ l.desc }}</li>
@@ -134,179 +155,248 @@
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="container footer ltr">
     <span>Deployed on Kubernetes · GitHub Actions CI/CD</span>
     <a href="https://github.com/{{ repo }}" target="_blank" rel="noopener">View on GitHub</a>
   </footer>
 
-  <!-- Videos injected -->
-  <script id="videos-data" type="application/json">
-    {{ videos|tojson|safe }}
+  <!-- Floating action: Idea -->
+  <button id="open-idea" class="fab" title="יש לכם רעיון?">💡</button>
+
+  <!-- Modal: Idea submit -->
+  <dialog id="idea-modal" class="modal">
+    <form method="dialog" id="idea-form" class="modal-card">
+      <header class="modal-head">
+        <h3>יש לכם רעיון?</h3>
+        <button class="icon-btn" id="idea-close" aria-label="סגירה">✕</button>
+      </header>
+      <div class="modal-body">
+        <label>שם (אופציונלי)</label>
+        <input type="text" id="idea-name" placeholder="שם פרטי…">
+
+        <label style="margin-top:.5rem">רעיון</label>
+        <textarea id="idea-text" rows="4" placeholder="שתפו טיפ, כלי, שיפור…"></textarea>
+
+        <p id="idea-msg" class="muted" style="display:none;margin-top:.5rem"></p>
+      </div>
+      <footer class="modal-foot">
+        <button type="submit" class="primary">שליחה</button>
+        <button type="button" id="idea-cancel">ביטול</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Inline data arrays for JS (avoid tojson dependency) -->
+  <script>
+    // Build a JS array of videos from server-side context
+    const VIDEOS = [
+      {% for v in videos %}
+        { title: {{ (v.title or '')|tojson }}, embed: {{ (v.embed or '')|tojson }} }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
   </script>
 
-  <!-- Ideas modal -->
-  <div id="idea-modal" class="modal hidden" aria-hidden="true">
-    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="idea-title">
-      <div class="modal__header">
-        <h3 id="idea-title">יש לכם רעיון?</h3>
-        <button id="idea-close" class="modal__close" aria-label="סגור">×</button>
-      </div>
-      <div class="modal__body">
-        <label class="field">
-          <span>שם (אופציונלי)</span>
-          <input id="idea-name" type="text" placeholder="איך לקרוא לך?">
-        </label>
-        <label class="field">
-          <span>ה רעיון</span>
-          <textarea id="idea-text" rows="5" dir="auto" placeholder="ספרו בקצרה מה תרצו לראות פה..."></textarea>
-        </label>
-      </div>
-      <div class="modal__footer">
-        <button id="idea-cancel" class="btn">בטל</button>
-        <button id="idea-save" class="btn-primary">שמור</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    /* ===== Search (local + web) ===== */
-    async function runSearch() {
-      const q = document.getElementById('q').value.trim();
-      const box = document.getElementById('results');
-      if (!q) { box.innerHTML = ''; return; }
-      box.innerHTML = 'מחפש...';
-      try {
-        const r = await fetch('/search?q=' + encodeURIComponent(q) + '&scope=all');
-        const data = await r.json();
-        if (!data.results || !data.results.length) {
-          box.innerHTML = '<p>לא נמצאו תוצאות.</p>'; return;
-        }
-        box.innerHTML = data.results.map(item => `
-          <div class="card">
-            <small class="tag">${item.type || 'link'}</small>
-            <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
-              <h4>${item.title || 'ללא כותרת'}</h4>
-            </a>
-            <p>${item.desc || ''}</p>
-          </div>`).join('');
-      } catch { box.innerHTML = '<p>שגיאה בחיפוש.</p>'; }
-    }
-    document.getElementById('btn').addEventListener('click', runSearch);
-    document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
-
-    /* ===== Carousels (quotes/tips/videos) ===== */
-    let QUOTES = [], TIPS = [], VIDEOS = [];
-    const st = { qi: 0, ti: 0, vi: 0 };
-    const $  = (id) => document.getElementById(id);
-
-    (function loadVideosFromScript(){
-      const el = document.getElementById('videos-data');
-      try { VIDEOS = JSON.parse(el.textContent || '[]'); } catch {}
-      renderVideo();
-    })();
-
-    function renderVideo(){
-      if (!VIDEOS.length) return;
-      const v = VIDEOS[st.vi % VIDEOS.length];
-      $('video-title').textContent = v.title || '';
-      const f = $('video-iframe');
-      f.src = v.embed || v.url || '';
-      f.title = v.title || 'video';
-    }
-
-    async function loadQuotesTips(){
-      try{
-        const [qRes, tRes] = await Promise.all([
-          fetch('/api/quotes', {cache:'no-store'}),
-          fetch('/api/tips',   {cache:'no-store'}),
-        ]);
-        QUOTES = await qRes.json();
-        TIPS   = await tRes.json();
-        const day = Math.floor(Date.now()/86400000);
-        if (QUOTES.length) st.qi = day % QUOTES.length;
-        if (TIPS.length)   st.ti = day % TIPS.length;
-        renderQuote(); renderTip();
-      }catch(e){ console.error(e); }
-    }
-    function renderQuote(){
-      if (!QUOTES.length) return;
-      const q = QUOTES[st.qi % QUOTES.length];
-      $('quote-text').textContent = `“${q.text}”`;
-      const qa = $('quote-author');
-      qa.textContent = q.author ? `— ${q.author}` : '';
-    }
-    function renderTip(){
-      if (!TIPS.length) return;
-      const t = TIPS[st.ti % TIPS.length];
-      $('tip-title').textContent = t.title || '';
-      $('tip-body').textContent  = t.body  || '';
-      const link = $('tip-link');
-      link.textContent = t.source || 'source';
-      link.href = t.url || '#';
-    }
-    function step(kind, dir){
-      if (kind==='quote' && QUOTES.length){ st.qi=(st.qi+dir+QUOTES.length)%QUOTES.length; renderQuote(); }
-      if (kind==='tip'   && TIPS.length){   st.ti=(st.ti+dir+TIPS.length)%TIPS.length;   renderTip(); }
-      if (kind==='video' && VIDEOS.length){ st.vi=(st.vi+dir+VIDEOS.length)%VIDEOS.length; renderVideo(); }
-    }
-    document.querySelectorAll('.nav-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const kind = btn.dataset.target;
-        const dir  = btn.classList.contains('next') ? +1 : -1;
-        step(kind, dir);
-      });
-    });
-
-    /* ===== Ideas modal + API ===== */
-    const ideas = {
-      modal: document.getElementById('idea-modal'),
-      openBtn: document.getElementById('open-idea'),
-      closeBtn: document.getElementById('idea-close'),
-      cancelBtn: document.getElementById('idea-cancel'),
-      saveBtn: document.getElementById('idea-save'),
-      name: document.getElementById('idea-name'),
-      text: document.getElementById('idea-text'),
-      list: document.getElementById('ideas-list'),
-      open(){ this.modal.classList.remove('hidden'); this.text.focus(); },
-      close(){ this.modal.classList.add('hidden'); this.name.value=''; this.text.value=''; },
-      async load(){
-        try{
-          const r = await fetch('/api/ideas', {cache:'no-store'});
-          const data = await r.json();
-          const items = (data.items||[]);
-          this.list.innerHTML = items.length ? items.map(it=>{
-            const dt = new Date((it.ts||0)*1000);
-            const when = dt.toLocaleString('he-IL');
-            const who  = it.name ? `<strong>${it.name}</strong> · ` : '';
-            return `<li class="idea-item"><div>${who}<span class="muted">${when}</span></div><p>${(it.text||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</p></li>`;
-          }).join('') : '<li class="muted">אין עדיין רעיונות. היו הראשונים!</li>';
-        }catch(e){ this.list.innerHTML = '<li class="muted">שגיאה בטעינת רעיונות.</li>'; }
-      },
-      async save(){
-        const payload = { name: this.name.value.trim(), text: this.text.value.trim() };
-        if (!payload.text || payload.text.length < 3){ alert('כתוב רעיון קצר (לפחות 3 תווים)'); return; }
-        this.saveBtn.disabled = true;
-        try{
-          const r = await fetch('/api/ideas', {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-          });
-          if (!r.ok) throw new Error('bad status '+r.status);
-          this.close();
-          await this.load();
-        }catch(e){ alert('שמירה נכשלה'); }
-        finally{ this.saveBtn.disabled = false; }
+  // ---------- Search ----------
+  async function runSearch() {
+    const q = document.getElementById('q').value.trim();
+    const scope = document.getElementById('scope').value;
+    const strict = document.getElementById('strict').checked ? 1 : 0;
+    const box = document.getElementById('results');
+    if (!q) { box.innerHTML = ''; return; }
+    box.innerHTML = 'מחפש...';
+    try {
+      const r = await fetch(`/search?q=${encodeURIComponent(q)}&scope=${scope}&strict=${strict}`);
+      const data = await r.json();
+      if (!data.results || !data.results.length) {
+        box.innerHTML = '<p>לא נמצאו תוצאות.</p>';
+        return;
       }
-    };
-    ideas.openBtn.addEventListener('click', ()=>ideas.open());
-    ideas.closeBtn.addEventListener('click', ()=>ideas.close());
-    ideas.cancelBtn.addEventListener('click', ()=>ideas.close());
-    ideas.saveBtn.addEventListener('click', ()=>ideas.save());
-    ideas.modal.addEventListener('click', (e)=>{ if(e.target===ideas.modal){ ideas.close(); } });
+      box.innerHTML = data.results.map(item => `
+        <div class="card">
+          <small class="tag">${item.type || 'link'}</small>
+          <a class="result-link" href="${item.url}" target="_blank" rel="noopener">
+            <h4>${item.title || 'ללא כותרת'}</h4>
+          </a>
+          <p>${item.desc || ''}</p>
+        </div>
+      `).join('');
+    } catch (e) {
+      box.innerHTML = '<p>שגיאה בחיפוש.</p>';
+    }
+  }
+  document.getElementById('btn').addEventListener('click', runSearch);
+  document.getElementById('q').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
 
-    // init
-    loadQuotesTips();
-    ideas.load();
+  // ---------- Quotes carousel (with category/tags) ----------
+  let QUOTES = [];
+  let qIndex = 0;
+
+  function renderQuote(q) {
+    const qText = document.getElementById('q-text');
+    const qMeta = document.getElementById('q-meta');
+    const qCat  = document.getElementById('q-cat');
+    const qTags = document.getElementById('q-tags');
+
+    qText.textContent = q.text || '';
+
+    // category/tags visibility
+    if ((q.category && q.category.length) || (q.tags && q.tags.length)) {
+      qMeta.style.display = '';
+      if (q.category) {
+        qCat.style.display = '';
+        qCat.textContent = q.category;
+      } else {
+        qCat.style.display = 'none';
+        qCat.textContent = '';
+      }
+      qTags.innerHTML = (q.tags || []).map(t => `<span class="chip">${t}</span>`).join('');
+    } else {
+      qMeta.style.display = 'none';
+      qCat.textContent = '';
+      qTags.innerHTML = '';
+    }
+  }
+
+  function stepQuote(dir) {
+    if (!QUOTES.length) return;
+    qIndex = (qIndex + dir + QUOTES.length) % QUOTES.length;
+    renderQuote(QUOTES[qIndex]);
+  }
+
+  async function initQuotes() {
+    try {
+      const res = await fetch('/api/quotes');
+      const data = await res.json();
+      // Normalize items: support {text} only, or with category/tags
+      QUOTES = (data || []).map(it => {
+        if (typeof it === 'string') return { text: it, category: null, tags: [] };
+        return {
+          text: it.text || '',
+          category: it.category || null,
+          tags: Array.isArray(it.tags) ? it.tags : []
+        };
+      });
+      // Find the server-rendered quote as starting point
+      const currentText = document.getElementById('q-text').textContent;
+      const i = QUOTES.findIndex(x => x.text === currentText);
+      qIndex = i >= 0 ? i : 0;
+      // Re-render (ensures category/tags appear also for initial)
+      renderQuote(QUOTES[qIndex]);
+    } catch (e) {
+      // keep server-rendered single quote
+    }
+  }
+
+  document.getElementById('q-prev').addEventListener('click', ()=> stepQuote(-1));
+  document.getElementById('q-next').addEventListener('click', ()=> stepQuote(+1));
+
+  // ---------- Tips carousel ----------
+  let TIPS = [];
+  let tIndex = 0;
+
+  function renderTip(t) {
+    document.getElementById('t-title').textContent = t.title || '';
+    document.getElementById('t-body').textContent  = t.body || '';
+    const a = document.getElementById('t-url');
+    a.textContent = t.source || '';
+    a.href = t.url || '#';
+  }
+
+  function stepTip(dir) {
+    if (!TIPS.length) return;
+    tIndex = (tIndex + dir + TIPS.length) % TIPS.length;
+    renderTip(TIPS[tIndex]);
+  }
+
+  async function initTips() {
+    try {
+      const res = await fetch('/api/tips');
+      const data = await res.json();
+      TIPS = (data || []);
+      const currentTitle = document.getElementById('t-title').textContent;
+      const i = TIPS.findIndex(x => (x.title||'') === currentTitle);
+      tIndex = i >= 0 ? i : 0;
+      renderTip(TIPS[tIndex]);
+    } catch (e) {
+      // keep server-rendered single tip
+    }
+  }
+
+  document.getElementById('t-prev').addEventListener('click', ()=> stepTip(-1));
+  document.getElementById('t-next').addEventListener('click', ()=> stepTip(+1));
+
+  // ---------- Video carousel ----------
+  let vIndex = 0;
+
+  function renderVideo(i) {
+    if (!VIDEOS.length) return;
+    const v = VIDEOS[i];
+    document.getElementById('v-title').textContent = v.title || '';
+    const iframe = document.getElementById('v-iframe');
+    iframe.src = v.embed || '';
+    iframe.title = v.title || '';
+  }
+
+  function stepVideo(dir) {
+    if (!VIDEOS.length) return;
+    vIndex = (vIndex + dir + VIDEOS.length) % VIDEOS.length;
+    renderVideo(vIndex);
+  }
+
+  document.getElementById('v-prev').addEventListener('click', ()=> stepVideo(-1));
+  document.getElementById('v-next').addEventListener('click', ()=> stepVideo(+1));
+
+  // ---------- Ideas modal ----------
+  const modal  = document.getElementById('idea-modal');
+  const openBt = document.getElementById('open-idea');
+  const closeX = document.getElementById('idea-close');
+  const cancel = document.getElementById('idea-cancel');
+  const form   = document.getElementById('idea-form');
+  const msg    = document.getElementById('idea-msg');
+
+  function openModal(){ modal.showModal(); }
+  function closeModal(){ modal.close(); }
+
+  openBt.addEventListener('click', openModal);
+  closeX.addEventListener('click', closeModal);
+  cancel.addEventListener('click', closeModal);
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msg.style.display = 'none';
+    const name = (document.getElementById('idea-name').value || '').trim();
+    const text = (document.getElementById('idea-text').value || '').trim();
+    if (!text) {
+      msg.textContent = 'נא למלא רעיון.';
+      msg.style.display = '';
+      return;
+    }
+    try {
+      const r = await fetch('/api/ideas', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name, text })
+      });
+      if (!r.ok) throw new Error('bad status');
+      msg.textContent = 'תודה! הרעיון נשמר.';
+      msg.style.display = '';
+      form.reset();
+      setTimeout(closeModal, 800);
+    } catch (err) {
+      msg.textContent = 'תקלה בשליחה. נסו שוב.';
+      msg.style.display = '';
+    }
+  });
+
+  // ---------- Init ----------
+  (async function init(){
+    initQuotes();
+    initTips();
+    // videos already have first rendered; keep it synced
+    if (VIDEOS.length) renderVideo(0);
+  })();
   </script>
 </body>
 </html>

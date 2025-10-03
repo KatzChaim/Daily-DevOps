@@ -174,6 +174,20 @@ def search_web(q: str, limit: int = 5, strict: bool = True) -> List[Dict[str, An
     return out
 
 
+# --- הוסף ב-main.py (קרוב לפונקציות העזר) ---
+def _normalize_quote(item):
+    # תומך גם בפורמט הישן (מחרוזת) וגם בחדש (אובייקט עם category/tags)
+    if isinstance(item, str):
+        return {"text": item, "category": None, "tags": []}
+    if isinstance(item, dict):
+        return {
+            "text": item.get("text", ""),
+            "category": item.get("category"),
+            "tags": item.get("tags", []) or []
+        }
+    return {"text": str(item), "category": None, "tags": []}
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # FastAPI – הגדרת האפליקציה והנתיבים
 # ──────────────────────────────────────────────────────────────────────────────

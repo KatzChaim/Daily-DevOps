@@ -1,99 +1,123 @@
-/* ===== עזרי LTR/יישורים ===== */
-.ltr{ direction:ltr; text-align:left; unicode-bidi:plaintext; }
-.align-start{ text-align:start; }
-
-/* ===== כרטיסים עם חיצים (כרוסל) ===== */
-.card-nav{
-  position: relative;
-  padding-inline: 56px;               /* מקום לחיצים */
+/* ====== Navigation arrows (quotes/tips/videos) ====== */
+.nav-row{
+  display:grid;
+  grid-template-columns:40px 1fr 40px;
+  gap:10px;
+  align-items:center;
 }
-.card-nav .nav-btn::before{ content: none !important; }
-
-/* כפתור חץ עגול */
-.card-nav .nav-btn{
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px; border-radius: 999px;
-  display: grid; place-items: center; cursor: pointer; z-index: 2;
-
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(15,23,42,.75);     /* שקוף כהה */
-  color: var(--text); backdrop-filter: blur(8px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  opacity: .95; transition: transform .15s ease, opacity .15s ease;
-}
-.card-nav .nav-btn:hover{ opacity:1; transform: translateY(-50%) scale(1.06); }
-.card-nav .nav-btn:active{ transform: translateY(-50%) scale(.96); }
-
-/* מיקום RTL תקין */
-.card-nav .prev{ left: 14px; } .card-nav .next{ right: 14px; }
-html[dir="rtl"] .card-nav .prev{ right:14px; left:auto; }
-html[dir="rtl"] .card-nav .next{ left:14px; right:auto; }
-
-/* איקון חץ (Chevron) */
-.card-nav .nav-btn .chev{ width:18px; height:18px; fill:currentColor; transition: transform .15s; }
-.card-nav .prev .chev{ transform: scaleX(-1); } .card-nav .next .chev{ transform:none; }
-html[dir="rtl"] .card-nav .prev .chev{ transform:none; }
-html[dir="rtl"] .card-nav .next .chev{ transform: scaleX(-1); }
-
-@media (max-width:640px){
-  .card-nav{ padding-inline:46px; }
-  .card-nav .nav-btn{ width:36px; height:36px; }
-}
-
-/* ===== כפתורים סטנדרטיים ===== */
-.btn{
-  padding:.55rem .9rem; border:1px solid rgba(255,255,255,.2);
-  border-radius:.6rem; background:rgba(255,255,255,.06);
-  color:var(--text); cursor:pointer;
-}
-.btn-primary{
-  padding:.6rem 1rem; border:0; border-radius:.65rem; cursor:pointer;
-  background:linear-gradient(45deg,var(--acc),#60a5fa); color:white; box-shadow: var(--shadow)
-}
-.btn:disabled,.btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
-
-/* ===== רשימת רעיונות ===== */
-.ideas-actions{ margin:.4rem 0 1rem; }
-.ideas-list{ list-style:none; padding:0; margin:.6rem 0 0; display:grid; gap:.6rem; }
-.idea-item{
-  background: rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:.8rem; padding:.7rem .8rem;
-}
-
-/* ===== מודאל רעיון ===== */
-.modal{
-  position: fixed; inset:0;
+.nav-content{ min-width:0 } /* prevents overflow */
+.nav-btn{
+  width:36px; height:36px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
   display:flex; align-items:center; justify-content:center;
-  background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
-  z-index: 9999;                            /* מעל הכול */
+  cursor:pointer; transition:transform .08s ease, background .15s ease;
 }
-.modal.hidden{ display:none; }
-.modal__dialog{
-  width:min(680px,92vw); background: var(--panel); color:var(--text);
-  border:1px solid rgba(255,255,255,.08); border-radius:1rem; box-shadow: var(--shadow);
-}
-.modal__header{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:.9rem 1rem; border-bottom:1px solid rgba(255,255,255,.08);
-}
-.modal__close{ background:transparent; border:0; color:var(--text); font-size:1.4rem; cursor:pointer; line-height:1; }
-
-/* גוף המודאל – טור אנכי קבוע (מונע 'בריחה לצד') */
-.modal__body{
-  padding: 1rem;
-  display:flex; flex-direction: column; gap:.9rem;
-}
-.modal__footer{
-  padding:.9rem 1rem; display:flex; gap:.6rem; justify-content:flex-end;
-  border-top:1px solid rgba(255,255,255,.08);
-}
-.field span{ display:block; margin-bottom:.35rem; color:var(--muted); font-size:.95rem; }
-.field input,.field textarea{
-  width:100%; padding:.6rem .7rem; border:1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.06); color: var(--text); border-radius:.6rem; outline:none;
+.nav-btn:hover{ background:rgba(255,255,255,.08) }
+.nav-btn:active{ transform:scale(.96) }
+.nav-btn svg{
+  fill:none; stroke:#cbd5e1; stroke-width:2;
+  stroke-linecap:round; stroke-linejoin:round;
 }
 
-@media (max-width:480px){
-  .modal__dialog{ margin:10px; }           /* מרווח קטן למובייל קטן */
+/* ====== Quote meta (category & tags) ====== */
+.meta{
+  margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.badge{
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  font-size:12px; line-height:1.2;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06); color:var(--text);
+}
+.badge-blue{
+  border-color:rgba(29,78,216,.40);
+  background:rgba(29,78,216,.18);
+}
+.chip{
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  font-size:12px; line-height:1.2;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04); color:var(--muted);
+}
+
+/* ====== Floating Action Button (open idea) ====== */
+.fab{
+  position:fixed; bottom:24px; right:24px; z-index:60;
+  width:56px; height:56px; border-radius:999px; cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);
+  background:linear-gradient(45deg,var(--acc),#60a5fa);
+  color:#fff; font-size:20px; box-shadow:var(--shadow);
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ====== Modal (dialog) ====== */
+/* Make the <dialog> itself transparent and center it. */
+.modal{
+  border:none; padding:0; background:transparent;
+  margin:auto; inset:0; /* center in viewport */
+}
+/* Dim the page behind */
+.modal::backdrop{
+  background:rgba(0,0,0,.55);
+}
+
+/* The visible card inside the modal */
+.modal-card{
+  width:min(560px, calc(100vw - 40px));
+  background:rgba(17,24,39,.98); /* gray-900-ish */
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px; box-shadow:var(--shadow);
+  color:var(--text);
+  display:flex; flex-direction:column; gap:12px;
+  padding:16px;
+}
+
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:4px;
+}
+.modal-head h3{ margin:0 }
+
+.icon-btn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:8px; color:var(--text);
+  padding:.25rem .55rem; cursor:pointer;
+}
+.icon-btn:hover{ background:rgba(255,255,255,.06) }
+
+.modal-body label{
+  display:block; font-size:14px; color:var(--muted); margin:.25rem 0;
+}
+.modal-body input,
+.modal-body textarea{
+  width:100%; box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05);
+  color:var(--text); border-radius:8px;
+  padding:.6rem .7rem; outline:none;
+}
+.modal-body textarea{ min-height:96px; resize:vertical }
+.modal-foot{
+  display:flex; justify-content:flex-end; gap:.5rem; margin-top:.25rem;
+}
+
+.primary{
+  background:linear-gradient(45deg,var(--acc),#60a5fa);
+  color:#fff; border:0; padding:.6rem .9rem; border-radius:10px; cursor:pointer;
+}
+.modal-foot button:not(.primary){
+  background:rgba(255,255,255,.05); color:var(--text);
+  border:1px solid rgba(255,255,255,.15);
+  padding:.55rem .8rem; border-radius:10px; cursor:pointer;
+}
+.modal-foot button:not(.primary):hover{
+  background:rgba(255,255,255,.08);
+}
+
+/* Small screens tweaks */
+@media(max-width:520px){
+  .nav-row{ grid-template-columns:36px 1fr 36px }
+  .nav-btn{ width:34px; height:34px }
 }
