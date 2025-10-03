@@ -1,123 +1,256 @@
-/* ====== Navigation arrows (quotes/tips/videos) ====== */
-.nav-row{
-  display:grid;
-  grid-template-columns:40px 1fr 40px;
-  gap:10px;
-  align-items:center;
-}
-.nav-content{ min-width:0 } /* prevents overflow */
-.nav-btn{
-  width:36px; height:36px; border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.05);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:transform .08s ease, background .15s ease;
-}
-.nav-btn:hover{ background:rgba(255,255,255,.08) }
-.nav-btn:active{ transform:scale(.96) }
-.nav-btn svg{
-  fill:none; stroke:#cbd5e1; stroke-width:2;
-  stroke-linecap:round; stroke-linejoin:round;
+/* ==========================================================================
+   addons.css – הרחבות עיצוב והנגשה ל-Daily DevOps
+   --------------------------------------------------------------------------
+   מה יש כאן?
+   1) Utilities (מחלקות עזר): .ltr, .badge
+   2) כותרות מקטעים עם חיצים עגולים: .section-head, .nav-wrap, .nav-btn
+   3) קרוסלת וידאו: התאמות ל-title/iframe
+   4) טופס "רעיון שלכם" + רשימת רעיונות: .idea-*
+   5) חיפוש: עיצוב select ותוצאות
+   6) LTR לקטעי אנגלית (כלים/הדרכה/פוטר)
+   --------------------------------------------------------------------------
+   הערה: מסתמך על משתנים מ-root שמוגדרים ב-style.css (כמו --acc, --text וכו').
+   ========================================================================== */
+
+
+/* =========================
+   1) Utilities
+   ========================= */
+
+/* מאלץ כיוון כתיבה משמאל לימין + יישור לשמאל (לתוכן באנגלית) */
+.ltr {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
-/* ====== Quote meta (category & tags) ====== */
-.meta{
-  margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-}
-.badge{
-  display:inline-block; padding:2px 8px; border-radius:999px;
-  font-size:12px; line-height:1.2;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.06); color:var(--text);
-}
-.badge-blue{
-  border-color:rgba(29,78,216,.40);
-  background:rgba(29,78,216,.18);
-}
-.chip{
-  display:inline-block; padding:2px 8px; border-radius:999px;
-  font-size:12px; line-height:1.2;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.04); color:var(--muted);
+/* תגית קטנה לקטגוריות/תגיות (#tag) */
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2b2f44;
+  color: #c7d2fe;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-inline-start: 6px; /* מרווח קטן בין תגיות */
 }
 
-/* ====== Floating Action Button (open idea) ====== */
-.fab{
-  position:fixed; bottom:24px; right:24px; z-index:60;
-  width:56px; height:56px; border-radius:999px; cursor:pointer;
-  border:1px solid rgba(255,255,255,.16);
-  background:linear-gradient(45deg,var(--acc),#60a5fa);
-  color:#fff; font-size:20px; box-shadow:var(--shadow);
-  display:flex; align-items:center; justify-content:center;
+
+/* =========================
+   2) כותרות מקטעים + חיצים עגולים
+   ========================= */
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* H2 מצד אחד, חיצים מצד שני */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-/* ====== Modal (dialog) ====== */
-/* Make the <dialog> itself transparent and center it. */
-.modal{
-  border:none; padding:0; background:transparent;
-  margin:auto; inset:0; /* center in viewport */
-}
-/* Dim the page behind */
-.modal::backdrop{
-  background:rgba(0,0,0,.55);
+.nav-wrap {
+  display: flex;
+  gap: 10px;
 }
 
-/* The visible card inside the modal */
-.modal-card{
-  width:min(560px, calc(100vw - 40px));
-  background:rgba(17,24,39,.98); /* gray-900-ish */
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px; box-shadow:var(--shadow);
-  color:var(--text);
-  display:flex; flex-direction:column; gap:12px;
-  padding:16px;
+/* כפתור חץ עגול – גדול, ברור, נגיש */
+.nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+  padding: 0; /* שלא יזיז את ה-SVG */
 }
 
-.modal-head{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin-bottom:4px;
-}
-.modal-head h3{ margin:0 }
-
-.icon-btn{
-  background:transparent;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:8px; color:var(--text);
-  padding:.25rem .55rem; cursor:pointer;
-}
-.icon-btn:hover{ background:rgba(255,255,255,.06) }
-
-.modal-body label{
-  display:block; font-size:14px; color:var(--muted); margin:.25rem 0;
-}
-.modal-body input,
-.modal-body textarea{
-  width:100%; box-sizing:border-box;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.05);
-  color:var(--text); border-radius:8px;
-  padding:.6rem .7rem; outline:none;
-}
-.modal-body textarea{ min-height:96px; resize:vertical }
-.modal-foot{
-  display:flex; justify-content:flex-end; gap:.5rem; margin-top:.25rem;
+.nav-btn:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
 }
 
-.primary{
-  background:linear-gradient(45deg,var(--acc),#60a5fa);
-  color:#fff; border:0; padding:.6rem .9rem; border-radius:10px; cursor:pointer;
-}
-.modal-foot button:not(.primary){
-  background:rgba(255,255,255,.05); color:var(--text);
-  border:1px solid rgba(255,255,255,.15);
-  padding:.55rem .8rem; border-radius:10px; cursor:pointer;
-}
-.modal-foot button:not(.primary):hover{
-  background:rgba(255,255,255,.08);
+.nav-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
-/* Small screens tweaks */
-@media(max-width:520px){
-  .nav-row{ grid-template-columns:36px 1fr 36px }
-  .nav-btn{ width:34px; height:34px }
+.nav-btn:focus-visible {
+  outline: 2px solid #60a5fa; /* פוקוס נגיש */
+  outline-offset: 2px;
+}
+
+/* חץ (SVG) – קו נקי */
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* שמות עזר: לא מסובבים את החצים ב-RTL!
+   הכיוון נקבע ע"י ה-SVG path בהטמעה ב-HTML:
+   - nav-left  = "הקודם"
+   - nav-right = "הבא"
+*/
+.nav-left  { /* השארנו ריק בכוונה – הסמל כבר מצויר שמאלה */ }
+.nav-right { /* השארנו ריק בכוונה – הסמל כבר מצויר ימינה */ }
+
+
+/* =========================
+   3) קרוסלת וידאו – יציבות פריסה
+   ========================= */
+
+/* כותרת וידאו שתראה נקייה גם כשמתחלף וידאו */
+.video-title {
+  font-weight: 600;
+  color: var(--muted);
+  margin: 6px 6px 10px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* מונע "קפיצות" גובה בעת החלפת iframe */
+#vidFrame .video-frame {
+  min-height: 200px; /* בטוח גם למסכים קטנים; יש ratio ב-style.css */
+}
+
+
+/* =========================
+   4) טופס "רעיון שלכם" + רשימה
+   ========================= */
+
+.idea-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.idea-form input[type="text"],
+.idea-form textarea {
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 10px;
+  padding: .65rem .8rem;
+  outline: none;
+}
+
+.idea-form textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.idea-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.idea-form button[type="submit"] {
+  padding: .6rem 1rem;
+  border: 0;
+  border-radius: .7rem;
+  cursor: pointer;
+  background: linear-gradient(45deg, var(--acc), #60a5fa);
+  color: white;
+  box-shadow: var(--shadow);
+  font-weight: 600;
+}
+
+#ideaMsg {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* רשימת רעיונות אחרונים */
+.ideas-list {
+  display: grid;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+.idea-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.idea-item .idea-text {
+  margin-bottom: 6px;
+}
+
+.idea-item .idea-meta {
+  font-size: 12px;
+}
+
+
+/* =========================
+   5) חיפוש – select ותוצאות
+   ========================= */
+
+/* תיבת scope ליד החיפוש */
+.search-box select {
+  padding: .6rem .7rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: .6rem;
+  outline: none;
+}
+
+/* קלפי תוצאות */
+.result-card {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+}
+
+.result-card .tag {
+  display: inline-block;
+  background: #2b2f44;
+  color: #c7d2fe;
+  padding: .18rem .55rem;
+  border-radius: .7rem;
+  font-size: 12px;
+}
+
+.result-link h4 {
+  margin: .4rem 0 .2rem 0;
+}
+
+
+/* =========================
+   6) LTR לקטעי אנגלית (כלים/הדרכה/פוטר)
+   ========================= */
+
+/* הבטחת יישור לשמאל בתוך בלוקים שסימנו .ltr ב-HTML */
+.ltr h2,
+.ltr .tool,
+.ltr .tool-name,
+.ltr .tool-desc,
+.ltr .learning,
+.ltr .learning li,
+.footer.ltr {
+  text-align: left !important;
+}
+
+/* רשימת הדרכה – ריווח נקי באנגלית */
+.ltr .learning {
+  padding-left: 18px; /* קיזוז מרווח לבולט בנגע ה-LTR */
+}
+
+/* פוטר באנגלית – מיושר שמאלה (קיים גם ב-HTML מחלקת ltr) */
+.footer.ltr {
+  justify-content: space-between;
 }
