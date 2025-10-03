@@ -19,7 +19,7 @@ except Exception:
 from content import VIDEOS, TOOLS, LEARNING
 
 # Search allow-list (no ENV)
-from .search_config import is_allowed, QUERY_SUFFIX
+from search_config import is_allowed, QUERY_SUFFIX
 
 # Paths
 BASE = Path(__file__).resolve().parent
