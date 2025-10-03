@@ -1,9 +1,8 @@
 [
-  { "text": "Automate what hurts first." },
-  { "text": "Small, frequent deploys reduce risk." },
-  { "text": "You can’t improve what you don’t measure." },
-  { "text": "Infrastructure as Code or it will drift." },
-  { "text": "SLOs drive the right behavior." },
-  { "text": "Security is everyone’s job." }
+  { "text": "Automate what hurts first.", "category": "CI/CD", "tags": ["automation","toil"] },
+  { "text": "Small, frequent deploys reduce risk.", "category": "CI/CD", "tags": ["deploy","risk"] },
+  { "text": "You can't improve what you don't measure.", "category": "Observability", "tags": ["metrics","measurement"] },
+  { "text": "Infrastructure as Code or it will drift.", "category": "IaC", "tags": ["terraform","drift"] },
+  { "text": "SLOs drive the right behavior.", "category": "SRE", "tags": ["SLO","SLI","error-budget"] },
+  { "text": "Security is everyone's job.", "category": "Security", "tags": ["devsecops","culture"] }
 ]
-

@@ -1,99 +1,256 @@
-/* ===== עזרי LTR/יישורים ===== */
-.ltr{ direction:ltr; text-align:left; unicode-bidi:plaintext; }
-.align-start{ text-align:start; }
+/* ==========================================================================
+   addons.css – הרחבות עיצוב והנגשה ל-Daily DevOps
+   --------------------------------------------------------------------------
+   מה יש כאן?
+   1) Utilities (מחלקות עזר): .ltr, .badge
+   2) כותרות מקטעים עם חיצים עגולים: .section-head, .nav-wrap, .nav-btn
+   3) קרוסלת וידאו: התאמות ל-title/iframe
+   4) טופס "רעיון שלכם" + רשימת רעיונות: .idea-*
+   5) חיפוש: עיצוב select ותוצאות
+   6) LTR לקטעי אנגלית (כלים/הדרכה/פוטר)
+   --------------------------------------------------------------------------
+   הערה: מסתמך על משתנים מ-root שמוגדרים ב-style.css (כמו --acc, --text וכו').
+   ========================================================================== */
 
-/* ===== כרטיסים עם חיצים (כרוסל) ===== */
-.card-nav{
-  position: relative;
-  padding-inline: 56px;               /* מקום לחיצים */
-}
-.card-nav .nav-btn::before{ content: none !important; }
 
-/* כפתור חץ עגול */
-.card-nav .nav-btn{
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px; border-radius: 999px;
-  display: grid; place-items: center; cursor: pointer; z-index: 2;
+/* =========================
+   1) Utilities
+   ========================= */
 
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(15,23,42,.75);     /* שקוף כהה */
-  color: var(--text); backdrop-filter: blur(8px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  opacity: .95; transition: transform .15s ease, opacity .15s ease;
-}
-.card-nav .nav-btn:hover{ opacity:1; transform: translateY(-50%) scale(1.06); }
-.card-nav .nav-btn:active{ transform: translateY(-50%) scale(.96); }
-
-/* מיקום RTL תקין */
-.card-nav .prev{ left: 14px; } .card-nav .next{ right: 14px; }
-html[dir="rtl"] .card-nav .prev{ right:14px; left:auto; }
-html[dir="rtl"] .card-nav .next{ left:14px; right:auto; }
-
-/* איקון חץ (Chevron) */
-.card-nav .nav-btn .chev{ width:18px; height:18px; fill:currentColor; transition: transform .15s; }
-.card-nav .prev .chev{ transform: scaleX(-1); } .card-nav .next .chev{ transform:none; }
-html[dir="rtl"] .card-nav .prev .chev{ transform:none; }
-html[dir="rtl"] .card-nav .next .chev{ transform: scaleX(-1); }
-
-@media (max-width:640px){
-  .card-nav{ padding-inline:46px; }
-  .card-nav .nav-btn{ width:36px; height:36px; }
+/* מאלץ כיוון כתיבה משמאל לימין + יישור לשמאל (לתוכן באנגלית) */
+.ltr {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
-/* ===== כפתורים סטנדרטיים ===== */
-.btn{
-  padding:.55rem .9rem; border:1px solid rgba(255,255,255,.2);
-  border-radius:.6rem; background:rgba(255,255,255,.06);
-  color:var(--text); cursor:pointer;
-}
-.btn-primary{
-  padding:.6rem 1rem; border:0; border-radius:.65rem; cursor:pointer;
-  background:linear-gradient(45deg,var(--acc),#60a5fa); color:white; box-shadow: var(--shadow)
-}
-.btn:disabled,.btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
-
-/* ===== רשימת רעיונות ===== */
-.ideas-actions{ margin:.4rem 0 1rem; }
-.ideas-list{ list-style:none; padding:0; margin:.6rem 0 0; display:grid; gap:.6rem; }
-.idea-item{
-  background: rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:.8rem; padding:.7rem .8rem;
+/* תגית קטנה לקטגוריות/תגיות (#tag) */
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2b2f44;
+  color: #c7d2fe;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-inline-start: 6px; /* מרווח קטן בין תגיות */
 }
 
-/* ===== מודאל רעיון ===== */
-.modal{
-  position: fixed; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
-  z-index: 9999;                            /* מעל הכול */
-}
-.modal.hidden{ display:none; }
-.modal__dialog{
-  width:min(680px,92vw); background: var(--panel); color:var(--text);
-  border:1px solid rgba(255,255,255,.08); border-radius:1rem; box-shadow: var(--shadow);
-}
-.modal__header{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:.9rem 1rem; border-bottom:1px solid rgba(255,255,255,.08);
-}
-.modal__close{ background:transparent; border:0; color:var(--text); font-size:1.4rem; cursor:pointer; line-height:1; }
 
-/* גוף המודאל – טור אנכי קבוע (מונע 'בריחה לצד') */
-.modal__body{
-  padding: 1rem;
-  display:flex; flex-direction: column; gap:.9rem;
-}
-.modal__footer{
-  padding:.9rem 1rem; display:flex; gap:.6rem; justify-content:flex-end;
-  border-top:1px solid rgba(255,255,255,.08);
-}
-.field span{ display:block; margin-bottom:.35rem; color:var(--muted); font-size:.95rem; }
-.field input,.field textarea{
-  width:100%; padding:.6rem .7rem; border:1px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.06); color: var(--text); border-radius:.6rem; outline:none;
+/* =========================
+   2) כותרות מקטעים + חיצים עגולים
+   ========================= */
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* H2 מצד אחד, חיצים מצד שני */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-@media (max-width:480px){
-  .modal__dialog{ margin:10px; }           /* מרווח קטן למובייל קטן */
+.nav-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+/* כפתור חץ עגול – גדול, ברור, נגיש */
+.nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+  padding: 0; /* שלא יזיז את ה-SVG */
+}
+
+.nav-btn:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+}
+
+.nav-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.nav-btn:focus-visible {
+  outline: 2px solid #60a5fa; /* פוקוס נגיש */
+  outline-offset: 2px;
+}
+
+/* חץ (SVG) – קו נקי */
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* שמות עזר: לא מסובבים את החצים ב-RTL!
+   הכיוון נקבע ע"י ה-SVG path בהטמעה ב-HTML:
+   - nav-left  = "הקודם"
+   - nav-right = "הבא"
+*/
+.nav-left  { /* השארנו ריק בכוונה – הסמל כבר מצויר שמאלה */ }
+.nav-right { /* השארנו ריק בכוונה – הסמל כבר מצויר ימינה */ }
+
+
+/* =========================
+   3) קרוסלת וידאו – יציבות פריסה
+   ========================= */
+
+/* כותרת וידאו שתראה נקייה גם כשמתחלף וידאו */
+.video-title {
+  font-weight: 600;
+  color: var(--muted);
+  margin: 6px 6px 10px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* מונע "קפיצות" גובה בעת החלפת iframe */
+#vidFrame .video-frame {
+  min-height: 200px; /* בטוח גם למסכים קטנים; יש ratio ב-style.css */
+}
+
+
+/* =========================
+   4) טופס "רעיון שלכם" + רשימה
+   ========================= */
+
+.idea-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.idea-form input[type="text"],
+.idea-form textarea {
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 10px;
+  padding: .65rem .8rem;
+  outline: none;
+}
+
+.idea-form textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.idea-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.idea-form button[type="submit"] {
+  padding: .6rem 1rem;
+  border: 0;
+  border-radius: .7rem;
+  cursor: pointer;
+  background: linear-gradient(45deg, var(--acc), #60a5fa);
+  color: white;
+  box-shadow: var(--shadow);
+  font-weight: 600;
+}
+
+#ideaMsg {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* רשימת רעיונות אחרונים */
+.ideas-list {
+  display: grid;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+.idea-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.idea-item .idea-text {
+  margin-bottom: 6px;
+}
+
+.idea-item .idea-meta {
+  font-size: 12px;
+}
+
+
+/* =========================
+   5) חיפוש – select ותוצאות
+   ========================= */
+
+/* תיבת scope ליד החיפוש */
+.search-box select {
+  padding: .6rem .7rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: .6rem;
+  outline: none;
+}
+
+/* קלפי תוצאות */
+.result-card {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+}
+
+.result-card .tag {
+  display: inline-block;
+  background: #2b2f44;
+  color: #c7d2fe;
+  padding: .18rem .55rem;
+  border-radius: .7rem;
+  font-size: 12px;
+}
+
+.result-link h4 {
+  margin: .4rem 0 .2rem 0;
+}
+
+
+/* =========================
+   6) LTR לקטעי אנגלית (כלים/הדרכה/פוטר)
+   ========================= */
+
+/* הבטחת יישור לשמאל בתוך בלוקים שסימנו .ltr ב-HTML */
+.ltr h2,
+.ltr .tool,
+.ltr .tool-name,
+.ltr .tool-desc,
+.ltr .learning,
+.ltr .learning li,
+.footer.ltr {
+  text-align: left !important;
+}
+
+/* רשימת הדרכה – ריווח נקי באנגלית */
+.ltr .learning {
+  padding-left: 18px; /* קיזוז מרווח לבולט בנגע ה-LTR */
+}
+
+/* פוטר באנגלית – מיושר שמאלה (קיים גם ב-HTML מחלקת ltr) */
+.footer.ltr {
+  justify-content: space-between;
 }

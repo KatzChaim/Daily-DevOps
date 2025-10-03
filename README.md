@@ -1,178 +1,216 @@
-
-
 ```markdown
-# Daily DevOps Dashboard
+# Daily-DevOps 🚀
 
-⚙️ **Daily DevOps** — A FastAPI-based dashboard that delivers:
-- 📜 Quote of the Day (משפט היום)  
-- 💡 DevOps Tip of the Day  
-- 🎥 Curated DevOps Videos  
-- 🛠 Recommended Tools  
-- 📚 Learning Resources  
-- 🔍 Search (DevOps-only content)
+A small DevOps dashboard: **Quote of the Day**, **Tip of the Day**, a **video carousel** with arrows, **recommended tools**, **learning links**, and **DevOps-focused search** (local + web with allow-listed domains).  
+Built with **FastAPI**, containerized with **Docker**, deployed on **Kubernetes (AWS EKS)**, infra via **Terraform**, and **CI/CD** using **GitHub Actions**.
 
-UI fully supports Hebrew with RTL design, while comments and code instructions are in English.
+**English | [עברית](./README.he.md)**
 
 ---
 
-## 🚀 Features
-- **FastAPI backend** with static assets + Jinja2 templates.  
-- **Curated content** for DevOps videos, tools, and guides.  
-- **Kubernetes-ready** (Deployment, Service, HPA).  
-- **CI/CD** with GitHub Actions: build → push image → deploy to AWS EKS.  
-- **GHCR (GitHub Container Registry)** hosting for Docker images.  
+## What this project does (in two lines)
+- Serves a daily DevOps dashboard (+ curated search).
+- Ships a CI → build & push to GHCR → CD to EKS, pinning image to `GITHUB_SHA`.
 
 ---
 
-## 🏗 Project Structure
-
+## Repository layout
 ```
 
-Financial-management/
-├── Project/
-│   ├── main.py           # FastAPI app (entrypoint)
-│   ├── content.py        # Curated lists (videos, tools, learning)
-│   ├── templates/        # Jinja2 HTML templates
-│   ├── static/           # CSS, images, frontend assets
-│   └── data/             # JSON files (quotes.json, tips.json)
-├── k8s/
-│   ├── deployment.yaml   # Kubernetes Deployment
-│   ├── service.yaml      # LoadBalancer Service
-│   └── hpa.yaml          # Horizontal Pod Autoscaler
-├── infra/                # Terraform IaC for VPC + EKS
-├── .github/workflows/
-│   ├── cd-main.yml       # Build & Deploy workflow
-│   └── cd-eks-ghcr.yml   # Alternative deploy workflow
-└── README.md             # This file
+Project/
+├─ app/
+│  ├─ main.py                # FastAPI app & APIs
+│  ├─ content.py             # curated videos/tools/learning
+│  ├─ search_config.py       # allow-listed domains + query suffix
+│  ├─ templates/index.html   # Jinja2 template
+│  ├─ static/                # style.css, addons.css, icons/favicon.svg
+│  └─ data/                  # quotes.json, tips.json, ideas.json (created by API)
+├─ k8s/                      # Kubernetes manifests
+│  ├─ deployment.yaml
+│  ├─ service.yaml
+│  └─ hpa.yaml (optional)
+├─ infra/                    # Terraform (VPC + EKS)
+└─ .github/workflows/        # CI/CD
 
 ````
 
 ---
 
-## 🖥 Local Development
+## Prerequisites
+- Python 3.11+ / Docker 24+
+- kubectl 1.28+ / AWS CLI 2.9+
+- Terraform 1.6+ (if provisioning infra)
 
-### 1. Clone repo
+---
+
+## Run locally (5 minutes)
 ```bash
-git clone https://github.com/KatzChaim/Financial-management.git
-cd Financial-management
+cd Project
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# http://localhost:8000   (health: /healthz)
 ````
 
-### 2. Build Docker image
+### With Docker
 
 ```bash
-docker build -t fm-app:local Project
+cd Project
+docker build -t daily-devops:local .
+docker run --rm -p 8000:8000 daily-devops:local
 ```
-
-### 3. Run locally
-
-```bash
-docker run --rm -p 8000:8000 fm-app:local
-```
-
-### 4. Test endpoints
-
-```bash
-curl http://localhost:8000/healthz
-curl http://localhost:8000/
-```
-
-Or open [http://localhost:8000/](http://localhost:8000/) in browser.
 
 ---
 
-## ☸️ Kubernetes Deployment
+## Update content
 
-### 1. Apply manifests
+* Quotes/Tips: `Project/app/data/quotes.json`, `tips.json`
+* Videos/Tools/Learning: `Project/app/content.py`
+* Web search allow-list: `Project/app/search_config.py`
 
-```bash
-kubectl create ns prod
-kubectl -n prod apply -f k8s/
-```
-
-### 2. Check rollout
-
-```bash
-kubectl -n prod get deploy,svc,hpa,pods
-```
-
-Service will expose an **AWS ELB hostname** when type=LoadBalancer.
+  * `ALLOWED_DOMAINS` — trusted domains (kubernetes.io, docker.com, docs.github.com, …)
+  * `QUERY_SUFFIX` — extra query text (e.g. `"devops tutorial"`)
 
 ---
 
-## 🔄 CI/CD with GitHub Actions
+## Kubernetes (EKS) deployment
 
-### Workflow: `.github/workflows/cd-main.yml`
-
-* **On push to `main`**:
-
-  1. Build & push Docker image to GHCR (`latest` + commit SHA).
-  2. If `KUBECONFIG_B64` secret exists:
-
-     * Setup `kubectl`
-     * Deploy manifests to cluster
-     * Rollout updated image pinned to commit SHA.
-
-### Required GitHub Secrets:
-
-* `GITHUB_TOKEN` (default, provided by GitHub)
-* `KUBECONFIG_B64` (base64-encoded kubeconfig for your EKS cluster)
-
-> ⚠️ If you prefer AWS IAM keys instead of `KUBECONFIG_B64`, use the workflow `cd-eks-ghcr.yml`.
-
----
-
-## ☁️ Terraform Infra
-
-Infrastructure is defined in `infra/` using official Terraform AWS modules:
-
-* VPC
-* EKS (with managed node groups)
-
-### Basic commands:
+### 1) Provision infra (optional)
 
 ```bash
 cd infra
 terraform init
-terraform validate
-terraform plan  -var-file=dev.tfvars
 terraform apply -var-file=dev.tfvars -auto-approve
 ```
 
-To destroy resources (save $$):
+### 2) Connect to EKS
 
 ```bash
+aws eks update-kubeconfig --name <EKS_CLUSTER_NAME> --region <AWS_REGION>
+kubectl get nodes
+```
+
+### 3) Apply manifests
+
+```bash
+kubectl create ns prod 2>/dev/null || true
+kubectl -n prod apply -f k8s/
+kubectl -n prod rollout status deploy/fm-app
+kubectl -n prod get svc fm-svc -w   # wait for EXTERNAL-IP
+```
+
+> Ensure `k8s/deployment.yaml`’s `image:` points to your GHCR path:
+> `ghcr.io/<owner>/<repo>:<tag>`
+
+---
+
+## CI/CD (GitHub Actions)
+
+**What happens**
+
+* Build & push image to GHCR with tags `latest` and `${GITHUB_SHA}`
+* CD: update Deployment to `${GITHUB_SHA}` and wait for rollout
+
+**Required Secrets/Vars**
+
+| Name                                          | Kind       | Used for                         |
+| --------------------------------------------- | ---------- | -------------------------------- |
+| `AWS_REGION`                                  | Var/Secret | AWS region (e.g. `eu-central-1`) |
+| `EKS_CLUSTER_NAME`                            | Var/Secret | EKS cluster name (e.g. `fm-eks`) |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Secret     | if not using OIDC                |
+| `KUBECONFIG_B64`                              | Secret     | optional — CD via kubeconfig     |
+
+> Recommended: OIDC (IAM Role with GitHub trust) instead of long-lived keys.
+
+---
+
+## Frontend notes
+
+* RTL by default; English blocks use `.ltr`.
+* Quote/Tip/Video use **round arrows** (RTL-aware) defined in `static/addons.css`.
+* “Have an idea?” modal persists to `app/data/ideas.json`.
+
+---
+
+## Quick checks
+
+```bash
+curl http://<LB-DNS>/healthz
+kubectl -n prod logs deploy/fm-app
+kubectl -n prod get deploy,svc,ingress
+```
+
+---
+
+## Troubleshooting
+
+* **ImagePullBackOff** — verify image exists and path is correct (`ghcr.io/<owner>/<repo>:<tag>`). For private GHCR add `imagePullSecret`.
+* **No EXTERNAL-IP** — ensure `type: LoadBalancer`, public subnets, and AWS LB controller/permissions.
+* **"You must be logged in to the server"** — refresh kubeconfig/permissions (or OIDC).
+* **404 for quotes/tips** — ensure JSON files exist under `app/data`.
+
+---
+
+## Clean-up & costs
+
+EKS/NAT/LB incur costs. When done:
+
+```bash
+cd infra
 terraform destroy -var-file=dev.tfvars -auto-approve
 ```
 
+### Clean up old GHCR images
+
+Create a scheduled workflow:
+
+```yaml
+# .github/workflows/ghcr-cleanup.yml
+name: Cleanup GHCR
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0"   # weekly
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-type: "container"
+          package-name: "${{ github.repository }}"   # usually <owner>/<repo>
+          min-versions-to-keep: 15
+          delete-only-untagged-versions: true
+```
+
+### Local Docker cleanup
+
+```bash
+docker image prune -a
+docker system prune -a --volumes
+```
+
 ---
 
-## 🔍 Search (DevOps-only)
+## Screenshots
 
-* Search box on UI calls `/search?q=...`.
-* Currently matches only curated local content (`content.py`).
-* Future enhancement: integrate Google Custom Search API (restricted to DevOps domains).
-
----
-
-## 📦 Registry & Deployment
-
-Images are stored in:
+Place images under `docs/images/` and keep filenames short. Example:
 
 ```
-ghcr.io/katzchaim/financial-management
+docs/images/
+├─ 01-home.png
+├─ 02-search.png
+└─ 03-ideas-modal.png
 ```
 
-Deployed automatically to namespace `prod` in EKS.
+Embed them here:
 
----
+![Home](./docs/images/01-home.png)
+![Search](./docs/images/02-search.png)
+![Ideas modal](./docs/images/03-ideas-modal.png)
 
-## 📜 License
-
-MIT — free for personal and commercial use.
-
-```
-
----
-
-רוצה שאבנה לך גם גרסה **מקוצרת בעברית** של ה־README (בשפה טבעית יותר, למשתמשים לא טכניים), או שנשאיר רק את הגרסה המלאה באנגלית המקצועית?
-```
